@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue @ 事件监听语法详解</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #06b6d4;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .code-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+        .vue-panel {
+            border-left-color: #06b6d4;
+        }
+        .js-panel {
+            border-left-color: #f59e0b;
+        }
+        .result-panel {
+            border-left-color: #8b5cf6;
+        }
+        .panel-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .vue-header { color: #67e8f9; }
+        .js-header { color: #fbbf24; }
+        .result-header { color: #a78bfa; }
+        
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        .highlight {
+            background: rgba(6, 182, 212, 0.3);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .syntax-note {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .syntax-note h4 {
+            margin: 0 0 10px 0;
+            color: #60a5fa;
+        }
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .example-table th,
+        .example-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+        }
+        .example-table th {
+            background: rgba(255,255,255,0.1);
+            font-weight: bold;
+        }
+        .inline-code {
+            background: rgba(0,0,0,0.3);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .demo-area {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .demo-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .demo-btn {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
+        .reset-btn {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .demo-result {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 120px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .modifier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .modifier-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid #06b6d4;
+        }
+        .warning {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.1);
+            border-left-color: #22c55e;
+        }
+        .info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Vue @ 事件监听语法详解</h1>
+        
+        <!-- @ 基础语法 -->
+        <div class="section">
+            <div class="section-title">
+                🎯 @ - 事件监听语法（v-on简写）
+            </div>
+            
+            <div class="syntax-note">
+                <h4>💡 作用</h4>
+                <p><span class="inline-code">@</span> 是 <span class="inline-code">v-on:</span> 的简写，用于监听DOM事件并执行JavaScript代码</p>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="code-panel vue-panel">
+                    <div class="panel-header vue-header">Vue @ 语法</div>
+                    <pre><code>&lt;template&gt;
+  &lt;div&gt;
+    &lt;!-- 点击事件 --&gt;
+    &lt;button <span class="highlight">@click="handleClick"</span>&gt;点击我&lt;/button&gt;
+    
+    &lt;!-- 输入事件 --&gt;
+    &lt;input <span class="highlight">@input="onInput"</span> v-model="text" /&gt;
+    
+    &lt;!-- 键盘事件 --&gt;
+    &lt;input <span class="highlight">@keyup="onKeyUp"</span> /&gt;
+    
+    &lt;!-- 表单提交 --&gt;
+    &lt;form <span class="highlight">@submit="onSubmit"</span>&gt;
+      &lt;button type="submit"&gt;提交&lt;/button&gt;
+    &lt;/form&gt;
+    
+    &lt;!-- 鼠标事件 --&gt;
+    &lt;div <span class="highlight">@mouseenter="onMouseEnter"</span>
+         <span class="highlight">@mouseleave="onMouseLeave"</span>&gt;
+      悬停区域
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  data() {
+    return {
+      text: '',
+      clickCount: 0
+    }
+  },
+  methods: {
+    <span class="highlight">handleClick() {
+      this.clickCount++;
+      console.log('按钮被点击了');
+    },</span>
+    onInput(event) {
+      console.log('输入内容:', event.target.value);
+    },
+    onKeyUp(event) {
+      console.log('按键:', event.key);
+    },
+    onSubmit(event) {
+      event.preventDefault();
+      console.log('表单提交');
+    }
+  }
+}
+&lt;/script&gt;</code></pre>
+                </div>
+                
+                <div class="code-panel js-panel">
+                    <div class="panel-header js-header">原生JavaScript等价</div>
+                    <pre><code>// 获取DOM元素
+const button = document.querySelector('button');
+const input1 = document.querySelector('input[type="text"]');
+const input2 = document.querySelector('input[type="search"]');
+const form = document.querySelector('form');
+const hoverDiv = document.querySelector('.hover-area');
+
+// 数据
+let clickCount = 0;
+let text = '';
+
+// 添加事件监听器
+<span class="highlight">button.addEventListener('click', function() {
+  clickCount++;
+  console.log('按钮被点击了');
+});</span>
+
+<span class="highlight">input1.addEventListener('input', function(event) {
+  text = event.target.value;
+  console.log('输入内容:', event.target.value);
+});</span>
+
+<span class="highlight">input2.addEventListener('keyup', function(event) {
+  console.log('按键:', event.key);
+});</span>
+
+<span class="highlight">form.addEventListener('submit', function(event) {
+  event.preventDefault();
+  console.log('表单提交');
+});</span>
+
+<span class="highlight">hoverDiv.addEventListener('mouseenter', function() {
+  console.log('鼠标进入');
+});
+
+hoverDiv.addEventListener('mouseleave', function() {
+  console.log('鼠标离开');
+});</span>
+
+// 手动更新UI（Vue会自动处理）
+function updateUI() {
+  document.querySelector('.count').textContent = clickCount;
+}</code></pre>
+                </div>
+                
+                <div class="code-panel result-panel">
+                    <div class="panel-header result-header">等价关系</div>
+                    <pre><code><span style="color: #67e8f9;">Vue写法</span>          <span style="color: #fbbf24;">JavaScript等价</span>
+
+<span class="highlight">@click="handler"</span>   → addEventListener('click', handler)
+
+<span class="highlight">@input="onInput"</span>   → addEventListener('input', onInput)
+
+<span class="highlight">@keyup="onKey"</span>     → addEventListener('keyup', onKey)
+
+<span class="highlight">@submit="onSubmit"</span> → addEventListener('submit', onSubmit)
+
+<span class="highlight">@mouseenter="fn"</span>   → addEventListener('mouseenter', fn)
+
+<span class="highlight">@mouseleave="fn"</span>   → addEventListener('mouseleave', fn)
+
+<span class="highlight">@focus="onFocus"</span>   → addEventListener('focus', onFocus)
+
+<span class="highlight">@blur="onBlur"</span>     → addEventListener('blur', onBlur)
+
+<span class="highlight">@change="onChange"</span> → addEventListener('change', onChange)
+
+<span class="highlight">@load="onLoad"</span>     → addEventListener('load', onLoad)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 事件修饰符 -->
+        <div class="section">
+            <div class="section-title">
+                🛠️ 事件修饰符详解
+            </div>
+            
+            <div class="syntax-note">
+                <h4>💡 什么是修饰符</h4>
+                <p>修饰符是Vue特有的语法糖，用点号 <span class="inline-code">.</span> 连接，简化常见的事件处理需求</p>
+            </div>
+            
+            <table class="example-table">
+                <thead>
+                    <tr>
+                        <th>Vue修饰符</th>
+                        <th>完整写法</th>
+                        <th>JavaScript等价</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>@click.prevent</code></td>
+                        <td><code>v-on:click.prevent</code></td>
+                        <td><code>event.preventDefault()</code></td>
+                        <td>阻止默认行为</td>
+                    </tr>
+                    <tr>
+                        <td><code>@click.stop</code></td>
+                        <td><code>v-on:click.stop</code></td>
+                        <td><code>event.stopPropagation()</code></td>
+                        <td>阻止事件冒泡</td>
+                    </tr>
+                    <tr>
+                        <td><code>@click.capture</code></td>
+                        <td><code>v-on:click.capture</code></td>
+                        <td><code>addEventListener('click', handler, true)</code></td>
+                        <td>捕获阶段触发</td>
+                    </tr>
+                    <tr>
+                        <td><code>@click.self</code></td>
+                        <td><code>v-on:click.self</code></td>
+                        <td><code>if (event.target === event.currentTarget)</code></td>
+                        <td>只在元素自身触发</td>
+                    </tr>
+                    <tr>
+                        <td><code>@click.once</code></td>
+                        <td><code>v-on:click.once</code></td>
+                        <td><code>addEventListener('click', handler, {once: true})</code></td>
+                        <td>只触发一次</td>
+                    </tr>
+                    <tr>
+                        <td><code>@scroll.passive</code></td>
+                        <td><code>v-on:scroll.passive</code></td>
+                        <td><code>addEventListener('scroll', handler, {passive: true})</code></td>
+                        <td>被动监听，提升性能</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- 修饰符示例 -->
+            <div class="comparison-grid">
+                <div class="code-panel vue-panel">
+                    <div class="panel-header vue-header">Vue修饰符示例</div>
+                    <pre><code>&lt;template&gt;
+  &lt;div&gt;
+    &lt;!-- 阻止表单默认提交 --&gt;
+    &lt;form <span class="highlight">@submit.prevent="onSubmit"</span>&gt;
+      &lt;button type="submit"&gt;提交&lt;/button&gt;
+    &lt;/form&gt;
+    
+    &lt;!-- 阻止事件冒泡 --&gt;
+    &lt;div @click="parentClick"&gt;
+      父元素
+      &lt;button <span class="highlight">@click.stop="childClick"</span>&gt;
+        子元素（不会冒泡）
+      &lt;/button&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- 只触发一次 --&gt;
+    &lt;button <span class="highlight">@click.once="onceClick"</span>&gt;
+      只能点击一次
+    &lt;/button&gt;
+    
+    &lt;!-- 多个修饰符组合 --&gt;
+    &lt;button <span class="highlight">@click.stop.prevent="complexHandler"</span>&gt;
+      阻止冒泡和默认行为
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+                </div>
+                
+                <div class="code-panel js-panel">
+                    <div class="panel-header js-header">JavaScript手动实现</div>
+                    <pre><code>const form = document.querySelector('form');
+const childButton = document.querySelector('.child');
+const onceButton = document.querySelector('.once');
+const complexButton = document.querySelector('.complex');
+
+// .prevent 修饰符等价
+<span class="highlight">form.addEventListener('submit', function(event) {
+  event.preventDefault(); // 手动阻止默认行为
+  onSubmit();
+});</span>
+
+// .stop 修饰符等价
+<span class="highlight">childButton.addEventListener('click', function(event) {
+  event.stopPropagation(); // 手动阻止冒泡
+  childClick();
+});</span>
+
+// .once 修饰符等价
+<span class="highlight">onceButton.addEventListener('click', function handler() {
+  onceClick();
+  // 手动移除事件监听器实现只触发一次
+  onceButton.removeEventListener('click', handler);
+});
+// 或者使用 {once: true} 选项
+onceButton.addEventListener('click', onceClick, {once: true});</span>
+
+// 多个修饰符组合等价
+<span class="highlight">complexButton.addEventListener('click', function(event) {
+  event.stopPropagation();  // .stop
+  event.preventDefault();   // .prevent
+  complexHandler();
+});</span></code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 按键修饰符 -->
+        <div class="section">
+            <div class="section-title">
+                ⌨️ 按键修饰符
+            </div>
+            
+            <div class="modifier-grid">
+                <div class="modifier-card">
+                    <h4 style="color: #67e8f9; margin: 0 0 10px 0;">常用按键</h4>
+                    <div style="display: grid; gap: 5px; font-family: monospace; font-size: 0.9em;">
+                        <div><code>@keyup.enter</code> → Enter键</div>
+                        <div><code>@keyup.tab</code> → Tab键</div>
+                        <div><code>@keyup.delete</code> → Delete/Backspace</div>
+                        <div><code>@keyup.esc</code> → Escape键</div>
+                        <div><code>@keyup.space</code> → 空格键</div>
+                        <div><code>@keyup.up</code> → 上箭头</div>
+                        <div><code>@keyup.down</code> → 下箭头</div>
+                        <div><code>@keyup.left</code> → 左箭头</div>
+                        <div><code>@keyup.right</code> → 右箭头</div>
+                    </div>
+                </div>
+                
+                <div class="modifier-card">
+                    <h4 style="color: #67e8f9; margin: 0 0 10px 0;">系统修饰键</h4>
+                    <div style="display: grid; gap: 5px; font-family: monospace; font-size: 0.9em;">
+                        <div><code>@click.ctrl</code> → Ctrl键</div>
+                        <div><code>@click.alt</code> → Alt键</div>
+                        <div><code>@click.shift</code> → Shift键</div>
+                        <div><code>@click.meta</code> → Meta键(Cmd/Win)</div>
+                        <div><code>@click.ctrl.exact</code> → 只有Ctrl</div>
+                        <div><code>@keyup.ctrl.c</code> → Ctrl+C</div>
+                        <div><code>@keyup.ctrl.s</code> → Ctrl+S</div>
+                    </div>
+                </div>
+                
+                <div class="modifier-card">
+                    <h4 style="color: #67e8f9; margin: 0 0 10px 0;">鼠标修饰符</h4>
+                    <div style="display: grid; gap: 5px; font-family: monospace; font-size: 0.9em;">
+                        <div><code>@click.left</code> → 左键点击</div>
+                        <div><code>@click.right</code> → 右键点击</div>
+                        <div><code>@click.middle</code> → 中键点击</div>
+                        <div><code>@contextmenu</code> → 右键菜单</div>
+                        <div><code>@dblclick</code> → 双击</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="code-panel vue-panel">
+                    <div class="panel-header vue-header">Vue按键修饰符</div>
+                    <pre><code>&lt;template&gt;
+  &lt;div&gt;
+    &lt;!-- 回车键搜索 --&gt;
+    &lt;input <span class="highlight">@keyup.enter="search"</span> 
+           placeholder="按回车搜索" /&gt;
+    
+    &lt;!-- Ctrl+S保存 --&gt;
+    &lt;textarea <span class="highlight">@keyup.ctrl.s="save"</span>&gt;&lt;/textarea&gt;
+    
+    &lt;!-- ESC键取消 --&gt;
+    &lt;div <span class="highlight">@keyup.esc="cancel"</span> tabindex="0"&gt;
+      按ESC取消
+    &lt;/div&gt;
+    
+    &lt;!-- 右键菜单 --&gt;
+    &lt;div <span class="highlight">@contextmenu.prevent="showMenu"</span>&gt;
+      右键显示菜单
+    &lt;/div&gt;
+    
+    &lt;!-- 只有Ctrl键（不能有其他修饰键） --&gt;
+    &lt;button <span class="highlight">@click.ctrl.exact="ctrlOnly"</span>&gt;
+      只能Ctrl+点击
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+                </div>
+                
+                <div class="code-panel js-panel">
+                    <div class="panel-header js-header">JavaScript按键检测</div>
+                    <pre><code>const input = document.querySelector('input');
+const textarea = document.querySelector('textarea');
+const div = document.querySelector('.cancelable');
+const contextDiv = document.querySelector('.context');
+const button = document.querySelector('button');
+
+// 回车键检测
+<span class="highlight">input.addEventListener('keyup', function(event) {
+  if (event.key === 'Enter') {
+    search();
+  }
+});</span>
+
+// Ctrl+S组合键检测
+<span class="highlight">textarea.addEventListener('keyup', function(event) {
+  if (event.ctrlKey && event.key === 's') {
+    event.preventDefault();
+    save();
+  }
+});</span>
+
+// ESC键检测
+<span class="highlight">div.addEventListener('keyup', function(event) {
+  if (event.key === 'Escape') {
+    cancel();
+  }
+});</span>
+
+// 右键菜单
+<span class="highlight">contextDiv.addEventListener('contextmenu', function(event) {
+  event.preventDefault();
+  showMenu();
+});</span>
+
+// 精确修饰键检测
+<span class="highlight">button.addEventListener('click', function(event) {
+  // 检查只有Ctrl键被按下
+  if (event.ctrlKey && !event.altKey && 
+      !event.shiftKey && !event.metaKey) {
+    ctrlOnly();
+  }
+});</span></code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实际演示 -->
+        <div class="section">
+            <div class="section-title">
+                🎮 实际演示
+            </div>
+            
+            <div class="demo-area">
+                <div class="demo-controls">
+                    <button class="demo-btn" onclick="demoBasicEvents()">基础事件演示</button>
+                    <button class="demo-btn" onclick="demoModifiers()">修饰符演示</button>
+                    <button class="demo-btn" onclick="demoKeyEvents()">按键事件演示</button>
+                    <button class="reset-btn" onclick="resetEventDemo()">重置</button>
+                </div>
+                <div class="demo-result" id="event-demo">
+                    点击上方按钮体验Vue事件监听效果...
+                </div>
+            </div>
+        </div>
+
+        <!-- 总结对比 -->
+        <div class="section">
+            <div class="section-title">
+                📊 完整语法对比总结
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+                <div class="modifier-card success">
+                    <h4 style="color: #4ade80; margin: 0 0 15px 0;">✅ Vue的优势</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li>语法简洁：<code>@click="handler"</code></li>
+                        <li>修饰符强大：<code>.prevent</code>, <code>.stop</code></li>
+                        <li>按键简化：<code>.enter</code>, <code>.ctrl</code></li>
+                        <li>自动绑定this上下文</li>
+                        <li>声明式，易于理解</li>
+                    </ul>
+                </div>
+                
+                <div class="modifier-card warning">
+                    <h4 style="color: #f87171; margin: 0 0 15px 0;">⚙️ JavaScript特点</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li>需要手动addEventListener</li>
+                        <li>手动处理event对象</li>
+                        <li>手动检测按键和修饰键</li>
+                        <li>需要管理事件监听器生命周期</li>
+                        <li>更多代码，但更灵活</li>
+                    </ul>
+                </div>
+                
+                <div class="modifier-card info">
+                    <h4 style="color: #60a5fa; margin: 0 0 15px 0;">🎯 使用建议</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li>简单交互 → 用Vue @语法</li>
+                        <li>复杂事件逻辑 → 混合使用</li>
+                        <li>第三方库集成 → 用JavaScript</li>
+                        <li>性能敏感 → 考虑原生JS</li>
+                        <li>学习阶段 → 理解两者对应关系</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background: rgba(6, 182, 212, 0.1); border-left: 4px solid #06b6d4; padding: 20px; margin-top: 20px; border-radius: 0 12px 12px 0;">
+                <h4 style="color: #67e8f9; margin: 0 0 15px 0;">🚀 核心记忆</h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center;">
+                    <div>
+                        <div style="font-size: 1.5em; margin-bottom: 8px;">{{ }}</div>
+                        <div style="color: #a7f3d0; font-size: 0.9em;">显示内容</div>
+                        <div style="color: #6ee7b7; font-size: 0.8em;">textContent</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5em; margin-bottom: 8px;">:</div>
+                        <div style="color: #fcd34d; font-size: 0.9em;">绑定属性</div>
+                        <div style="color: #fbbf24; font-size: 0.8em;">setAttribute</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5em; margin-bottom: 8px;">@</div>
+                        <div style="color: #67e8f9; font-size: 0.9em;">监听事件</div>
+                        <div style="color: #06b6d4; font-size: 0.8em;">addEventListener</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let eventLog = [];
+        let clickCount = 0;
+        let keyPressCount = 0;
+
+        function demoBasicEvents() {
+            const demo = document.getElementById('event-demo');
+            clickCount = 0;
+            keyPressCount = 0;
+            
+            demo.innerHTML = `
+                <div style="background: rgba(6, 182, 212, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #06b6d4;">
+                    <h4 style="color: #67e8f9; margin: 0 0 15px 0;">🎯 基础事件演示</h4>
+                    
+                    <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button onclick="simulateClick()" style="padding: 8px 16px; background: #06b6d4; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                                点击按钮
+                            </button>
+                            <span style="color: #a7f3d0;">Vue: <code>@click="handleClick"</code></span>
+                            <span style="color: #fcd34d;">点击次数: ${clickCount}</span>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" placeholder="输入文字试试" oninput="simulateInput(this)" style="padding: 8px; border-radius: 6px; border: 1px solid #06b6d4; background: rgba(0,0,0,0.2); color: white;">
+                            <span style="color: #a7f3d0;">Vue: <code>@input="onInput"</code></span>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div onmouseenter="simulateHover(true)" onmouseleave="simulateHover(false)" 
+                                 style="padding: 8px 16px; background: rgba(6, 182, 212, 0.2); border: 1px dashed #06b6d4; border-radius: 6px; cursor: pointer;">
+                                悬停区域
+                            </div>
+                            <span style="color: #a7f3d0;">Vue: <code>@mouseenter</code> / <code>@mouseleave</code></span>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; line-height: 1.5;">
+                        <div style="color: #34d399; margin-bottom: 8px;">JavaScript等价代码:</div>
+                        <div style="color: #e5e7eb;">button.addEventListener('click', handleClick);</div>
+                        <div style="color: #e5e7eb;">input.addEventListener('input', onInput);</div>
+                        <div style="color: #e5e7eb;">div.addEventListener('mouseenter', onMouseEnter);</div>
+                        <div style="color: #e5e7eb;">div.addEventListener('mouseleave', onMouseLeave);</div>
+                    </div>
+                    
+                    <div id="event-log" style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px; min-height: 40px;">
+                        <div style="color: #9ca3af; font-size: 0.9em;">事件日志将显示在这里...</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function demoModifiers() {
+            const demo = document.getElementById('event-demo');
+            
+            demo.innerHTML = `
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #f59e0b;">
+                    <h4 style="color: #fbbf24; margin: 0 0 15px 0;">🛠️ 事件修饰符演示</h4>
+                    
+                    <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+                        <!-- 阻止默认行为 -->
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px; color: #fcd34d;">阻止默认行为 (.prevent)</div>
+                            <a href="https://example.com" onclick="event.preventDefault(); logModifier('prevent', '阻止了链接跳转')" style="color: #06b6d4; text-decoration: underline;">
+                                点我不会跳转
+                            </a>
+                            <div style="font-size: 0.8em; color: #94a3b8; margin-top: 5px;">
+                                Vue: <code>@click.prevent="handler"</code> → JS: <code>event.preventDefault()</code>
+                            </div>
+                        </div>
+                        
+                        <!-- 阻止冒泡 -->
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px; color: #fcd34d;">阻止事件冒泡 (.stop)</div>
+                            <div onclick="logModifier('parent', '父元素被点击')" style="padding: 10px; background: rgba(245, 158, 11, 0.2); border-radius: 4px; cursor: pointer;">
+                                父元素
+                                <button onclick="event.stopPropagation(); logModifier('stop', '阻止了事件冒泡')" style="margin: 5px; padding: 5px 10px; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    子元素 (不会冒泡)
+                                </button>
+                            </div>
+                            <div style="font-size: 0.8em; color: #94a3b8; margin-top: 5px;">
+                                Vue: <code>@click.stop="handler"</code> → JS: <code>event.stopPropagation()</code>
+                            </div>
+                        </div>
+                        
+                        <!-- 只触发一次 -->
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px; color: #fcd34d;">只触发一次 (.once)</div>
+                            <button id="once-btn" onclick="simulateOnce(this)" style="padding: 8px 16px; background: #8b5cf6; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                                只能点击一次
+                            </button>
+                            <div style="font-size: 0.8em; color: #94a3b8; margin-top: 5px;">
+                                Vue: <code>@click.once="handler"</code> → JS: <code>{once: true}</code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="modifier-log" style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; min-height: 40px;">
+                        <div style="color: #9ca3af; font-size: 0.9em;">修饰符效果日志...</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function demoKeyEvents() {
+            const demo = document.getElementById('event-demo');
+            
+            demo.innerHTML = `
+                <div style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #8b5cf6;">
+                    <h4 style="color: #a78bfa; margin: 0 0 15px 0;">⌨️ 按键事件演示</h4>
+                    
+                    <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px; color: #c4b5fd;">回车键搜索</div>
+                            <input type="text" placeholder="输入后按回车" onkeyup="handleEnterKey(event)" 
+                                   style="width: 200px; padding: 8px; border-radius: 6px; border: 1px solid #8b5cf6; background: rgba(0,0,0,0.2); color: white;">
+                            <div style="font-size: 0.8em; color: #94a3b8; margin-top: 5px;">
+                                Vue: <code>@keyup.enter="search"</code>
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px; color: #c4b5fd;">按键组合 (试试 Ctrl+S, Alt+C)</div>
+                            <div tabindex="0" onkeydown="handleKeyCombo(event)" 
+                                 style="padding: 20px; border: 2px dashed #8b5cf6; border-radius: 6px; text-align: center; cursor: pointer; outline: none;"
+                                 onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='#8b5cf6'">
+                                点击这里后按键
+                            </div>
+                            <div style="font-size: 0.8em; color: #94a3b8; margin-top: 5px;">
+                                Vue: <code>@keyup.ctrl.s</code>, <code>@keyup.alt.c</code>
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px; color: #c4b5fd;">方向键控制</div>
+                            <div id="arrow-box" tabindex="0" onkeydown="handleArrowKeys(event)"
+                                 style="width: 200px; height: 100px; border: 1px solid #8b5cf6; border-radius: 6px; position: relative; background: rgba(0,0,0,0.2); outline: none;"
+                                 onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='#8b5cf6'">
+                                <div id="arrow-dot" style="width: 10px; height: 10px; background: #a78bfa; border-radius: 50%; position: absolute; top: 45px; left: 95px; transition: all 0.2s;"></div>
+                            </div>
+                            <div style="font-size: 0.8em; color: #94a3b8; margin-top: 5px;">
+                                Vue: <code>@keydown.up</code>, <code>@keydown.down</code>, <code>@keydown.left</code>, <code>@keydown.right</code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="key-log" style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; min-height: 40px;">
+                        <div style="color: #9ca3af; font-size: 0.9em;">按键事件日志...</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetEventDemo() {
+            const demo = document.getElementById('event-demo');
+            eventLog = [];
+            clickCount = 0;
+            keyPressCount = 0;
+            
+            demo.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #9ca3af;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">⚡</div>
+                    <h4 style="margin: 0 0 10px 0;">事件监听演示</h4>
+                    <p style="margin: 0;">点击上方按钮体验Vue事件语法的实际效果</p>
+                </div>
+            `;
+        }
+
+        // 事件处理函数
+        function simulateClick() {
+            clickCount++;
+            logEvent('click', `按钮被点击，总计 ${clickCount} 次`);
+        }
+
+        function simulateInput(input) {
+            logEvent('input', `输入内容: "${input.value}"`);
+        }
+
+        function simulateHover(isEnter) {
+            logEvent(isEnter ? 'mouseenter' : 'mouseleave', isEnter ? '鼠标进入悬停区域' : '鼠标离开悬停区域');
+        }
+
+        function logEvent(type, message) {
+            const log = document.getElementById('event-log');
+            if (log) {
+                const time = new Date().toLocaleTimeString();
+                log.innerHTML = `
+                    <div style="color: #67e8f9; font-size: 0.9em; margin-bottom: 5px;">
+                        [${time}] ${type}: ${message}
+                    </div>
+                ` + log.innerHTML;
+            }
+        }
+
+        function logModifier(type, message) {
+            const log = document.getElementById('modifier-log');
+            if (log) {
+                const time = new Date().toLocaleTimeString();
+                log.innerHTML = `
+                    <div style="color: #fbbf24; font-size: 0.9em; margin-bottom: 5px;">
+                        [${time}] ${type}: ${message}
+                    </div>
+                ` + log.innerHTML;
+            }
+        }
+
+        function simulateOnce(button) {
+            button.style.opacity = '0.5';
+            button.style.cursor = 'not-allowed';
+            button.onclick = null;
+            logModifier('once', '按钮已被禁用，只能触发一次');
+        }
+
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                logKeyEvent('enter', `回车搜索: "${event.target.value}"`);
+                event.target.value = '';
+            }
+        }
+
+        function handleKeyCombo(event) {
+            let combo = [];
+            if (event.ctrlKey) combo.push('Ctrl');
+            if (event.altKey) combo.push('Alt');
+            if (event.shiftKey) combo.push('Shift');
+            if (event.metaKey) combo.push('Meta');
+            combo.push(event.key);
+            
+            logKeyEvent('combo', `按键组合: ${combo.join(' + ')}`);
+        }
+
+        let dotPosition = { x: 95, y: 45 };
+
+        function handleArrowKeys(event) {
+            const dot = document.getElementById('arrow-dot');
+            if (!dot) return;
+            
+            const step = 10;
+            let moved = false;
+            
+            switch (event.key) {
+                case 'ArrowUp':
+                    if (dotPosition.y > 0) {
+                        dotPosition.y -= step;
+                        moved = true;
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (dotPosition.y < 90) {
+                        dotPosition.y += step;
+                        moved = true;
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (dotPosition.x > 0) {
+                        dotPosition.x -= step;
+                        moved = true;
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (dotPosition.x < 190) {
+                        dotPosition.x += step;
+                        moved = true;
+                    }
+                    break;
+            }
+            
+            if (moved) {
+                dot.style.left = dotPosition.x + 'px';
+                dot.style.top = dotPosition.y + 'px';
+                logKeyEvent('arrow', `方向键: ${event.key} → 位置 (${dotPosition.x}, ${dotPosition.y})`);
+                event.preventDefault();
+            }
+        }
+
+        function logKeyEvent(type, message) {
+            const log = document.getElementById('key-log');
+            if (log) {
+                const time = new Date().toLocaleTimeString();
+                log.innerHTML = `
+                    <div style="color: #a78bfa; font-size: 0.9em; margin-bottom: 5px;">
+                        [${time}] ${type}: ${message}
+                    </div>
+                ` + log.innerHTML;
+            }
+        }
+
+        // 页面加载时重置演示
+        window.addEventListener('DOMContentLoaded', resetEventDemo);
+    </script>
+</body>
+</html>

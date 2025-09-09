@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue指令与JavaScript完整映射表</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: calc(100vh - 200px);
+            min-height: 500px;
+        }
+
+        .editor-section, .preview-section {
+            padding: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-section {
+            border-right: 2px solid #e5e7eb;
+            background: #fafafa;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #editor {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        #editor:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        #preview {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        /* Markdown预览样式 */
+        #preview h1 {
+            color: #1f2937;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin: 20px 0;
+            font-size: 2em;
+        }
+
+        #preview h2 {
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+            margin: 18px 0;
+            font-size: 1.5em;
+        }
+
+        #preview h3 {
+            color: #4b5563;
+            margin: 16px 0;
+            font-size: 1.3em;
+        }
+
+        #preview p {
+            line-height: 1.8;
+            margin: 12px 0;
+            color: #374151;
+        }
+
+        #preview pre {
+            background: rgba(102,128,153,.05);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        #preview code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        #preview :not(pre) > code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #e11d48;
+            font-size: 0.9em;
+        }
+
+        #preview blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 16px 0;
+            color: #6b7280;
+            background: #f9fafb;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        #preview ul, #preview ol {
+            padding-left: 30px;
+            margin: 12px 0;
+        }
+
+        #preview li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        #preview table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+        }
+
+        #preview th, #preview td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+        }
+
+        #preview th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        #preview img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        #preview a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        #preview a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .editor-section {
+                border-right: none;
+                border-bottom: 2px solid #e5e7eb;
+                min-height: 300px;
+            }
+
+            .preview-section {
+                min-height: 300px;
+            }
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            padding: 15px 30px;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat strong {
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+<div id="preview"><h1>Vue指令与原生JavaScript完整映射对照表</h1>
+    <h2>🎯 核心概念</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue概念</th>
+            <th>原生JavaScript等价操作</th>
+            <th>说明</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td>数据驱动</td>
+            <td>手动DOM操作</td>
+            <td>Vue自动同步数据和视图，JS需要手动更新</td>
+        </tr>
+        <tr>
+            <td>响应式系统</td>
+            <td>事件监听 + 手动更新</td>
+            <td>Vue使用Proxy/Observer，JS需要getter/setter</td>
+        </tr>
+        <tr>
+            <td>组件</td>
+            <td>函数/类 + DOM操作</td>
+            <td>Vue组件化，JS需要自己封装复用逻辑</td>
+        </tr>
+        </tbody></table>
+    <h2>📋 指令映射表</h2>
+    <h3>1. 属性绑定 (v-bind)</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue指令</th>
+            <th>原生JavaScript</th>
+            <th>示例对比</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td><code>v-bind:src="url"</code></td>
+            <td><code>element.src = url</code></td>
+            <td>图片源绑定</td>
+        </tr>
+        <tr>
+            <td><code>:class="className"</code></td>
+            <td><code>element.className = className</code></td>
+            <td>CSS类绑定</td>
+        </tr>
+        <tr>
+            <td><code>:style="styleObj"</code></td>
+            <td><code>Object.assign(element.style, styleObj)</code></td>
+            <td>样式对象绑定</td>
+        </tr>
+        <tr>
+            <td><code>:disabled="isDisabled"</code></td>
+            <td><code>element.disabled = isDisabled</code></td>
+            <td>禁用状态绑定</td>
+        </tr>
+        <tr>
+            <td><code>:href="link"</code></td>
+            <td><code>element.href = link</code></td>
+            <td>链接绑定</td>
+        </tr>
+        <tr>
+            <td><code>:value="inputValue"</code></td>
+            <td><code>element.value = inputValue</code></td>
+            <td>表单值绑定</td>
+        </tr>
+        </tbody></table>
+    <pre><code class="language-javascript">// Vue写法
+&lt;img :src="imageUrl" :alt="altText" /&gt;
+
+// JavaScript等价写法
+const img = document.createElement('img');
+img.src = imageUrl;
+img.alt = altText;
+</code></pre>
+    <h3>2. 事件监听 (v-on)</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue指令</th>
+            <th>原生JavaScript</th>
+            <th>说明</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td><code>@click="handler"</code></td>
+            <td><code>element.addEventListener('click', handler)</code></td>
+            <td>点击事件</td>
+        </tr>
+        <tr>
+            <td><code>@submit.prevent="onSubmit"</code></td>
+            <td><code>form.addEventListener('submit', e =&gt; { e.preventDefault(); onSubmit(); })</code></td>
+            <td>阻止默认提交</td>
+        </tr>
+        <tr>
+            <td><code>@keyup.enter="onEnter"</code></td>
+            <td><code>element.addEventListener('keyup', e =&gt; { if(e.key==='Enter') onEnter(); })</code></td>
+            <td>回车键监听</td>
+        </tr>
+        <tr>
+            <td><code>@click.stop="onClick"</code></td>
+            <td><code>element.addEventListener('click', e =&gt; { e.stopPropagation(); onClick(); })</code></td>
+            <td>阻止冒泡</td>
+        </tr>
+        <tr>
+            <td><code>@click.once="onOnce"</code></td>
+            <td><code>element.addEventListener('click', onOnce, {once: true})</code></td>
+            <td>只触发一次</td>
+        </tr>
+        </tbody></table>
+    <h3>3. 条件渲染 (v-if/v-show)</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue指令</th>
+            <th>原生JavaScript</th>
+            <th>区别说明</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td><code>v-if="condition"</code></td>
+            <td><code>if(condition) parent.appendChild(element); else element.remove();</code></td>
+            <td>完全移除/添加DOM</td>
+        </tr>
+        <tr>
+            <td><code>v-show="condition"</code></td>
+            <td><code>element.style.display = condition ? 'block' : 'none';</code></td>
+            <td>只控制显示/隐藏</td>
+        </tr>
+        <tr>
+            <td><code>v-else-if="other"</code></td>
+            <td><code>else if(other) { /* 显示逻辑 */ }</code></td>
+            <td>多条件分支</td>
+        </tr>
+        <tr>
+            <td><code>v-else</code></td>
+            <td><code>else { /* 默认显示 */ }</code></td>
+            <td>默认分支</td>
+        </tr>
+        </tbody></table>
+    <pre><code class="language-javascript">// Vue写法
+&lt;div v-if="isLoggedIn"&gt;欢迎回来&lt;/div&gt;
+&lt;div v-else&gt;请登录&lt;/div&gt;
+
+// JavaScript等价写法
+const container = document.getElementById('container');
+if (isLoggedIn) {
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.textContent = '欢迎回来';
+    container.appendChild(welcomeDiv);
+} else {
+    const loginDiv = document.createElement('div');
+    loginDiv.textContent = '请登录';
+    container.appendChild(loginDiv);
+}
+</code></pre>
+    <h3>4. 列表渲染 (v-for)</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue写法</th>
+            <th>原生JavaScript等价</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td><code>v-for="item in items"</code></td>
+            <td><code>items.forEach(item =&gt; { /* 创建DOM */ })</code></td>
+        </tr>
+        <tr>
+            <td><code>v-for="(item, index) in items"</code></td>
+            <td><code>items.forEach((item, index) =&gt; { /* 创建DOM */ })</code></td>
+        </tr>
+        <tr>
+            <td><code>:key="item.id"</code></td>
+            <td><code>element.setAttribute('data-key', item.id)</code></td>
+        </tr>
+        </tbody></table>
+    <pre><code class="language-javascript">// Vue写法
+&lt;ul&gt;
+  &lt;li v-for="user in users" :key="user.id"&gt;
+    {{ user.name }}
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+// JavaScript等价写法
+const ul = document.createElement('ul');
+users.forEach(user =&gt; {
+    const li = document.createElement('li');
+    li.textContent = user.name;
+    li.setAttribute('data-key', user.id);
+    ul.appendChild(li);
+});
+document.body.appendChild(ul);
+</code></pre>
+    <h3>5. 双向绑定 (v-model)</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>表单类型</th>
+            <th>Vue写法</th>
+            <th>JavaScript等价</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td>文本输入</td>
+            <td><code>&lt;input v-model="text"&gt;</code></td>
+            <td><code>input.value = text; input.oninput = e =&gt; text = e.target.value</code></td>
+        </tr>
+        <tr>
+            <td>复选框</td>
+            <td><code>&lt;input type="checkbox" v-model="checked"&gt;</code></td>
+            <td><code>checkbox.checked = checked; checkbox.onchange = e =&gt; checked = e.target.checked</code></td>
+        </tr>
+        <tr>
+            <td>单选框</td>
+            <td><code>&lt;input type="radio" v-model="picked" value="a"&gt;</code></td>
+            <td><code>radio.checked = picked === 'a'; radio.onchange = e =&gt; picked = e.target.value</code></td>
+        </tr>
+        <tr>
+            <td>下拉选择</td>
+            <td><code>&lt;select v-model="selected"&gt;</code></td>
+            <td><code>select.value = selected; select.onchange = e =&gt; selected = e.target.value</code></td>
+        </tr>
+        </tbody></table>
+    <h2>🎨 修饰符对照</h2>
+    <h3>事件修饰符</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue修饰符</th>
+            <th>JavaScript实现</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td><code>.prevent</code></td>
+            <td><code>event.preventDefault()</code></td>
+        </tr>
+        <tr>
+            <td><code>.stop</code></td>
+            <td><code>event.stopPropagation()</code></td>
+        </tr>
+        <tr>
+            <td><code>.capture</code></td>
+            <td><code>addEventListener(event, handler, true)</code></td>
+        </tr>
+        <tr>
+            <td><code>.self</code></td>
+            <td><code>if (event.target === event.currentTarget) { /* 处理 */ }</code></td>
+        </tr>
+        <tr>
+            <td><code>.once</code></td>
+            <td><code>addEventListener(event, handler, {once: true})</code></td>
+        </tr>
+        <tr>
+            <td><code>.passive</code></td>
+            <td><code>addEventListener(event, handler, {passive: true})</code></td>
+        </tr>
+        </tbody></table>
+    <h3>按键修饰符</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue修饰符</th>
+            <th>JavaScript实现</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td><code>.enter</code></td>
+            <td><code>if (event.key === 'Enter') { /* 处理 */ }</code></td>
+        </tr>
+        <tr>
+            <td><code>.tab</code></td>
+            <td><code>if (event.key === 'Tab') { /* 处理 */ }</code></td>
+        </tr>
+        <tr>
+            <td><code>.delete</code></td>
+            <td>`if (event.key === 'Delete'</td>
+        </tr>
+        <tr>
+            <td><code>.esc</code></td>
+            <td><code>if (event.key === 'Escape') { /* 处理 */ }</code></td>
+        </tr>
+        <tr>
+            <td><code>.ctrl</code></td>
+            <td><code>if (event.ctrlKey) { /* 处理 */ }</code></td>
+        </tr>
+        <tr>
+            <td><code>.shift</code></td>
+            <td><code>if (event.shiftKey) { /* 处理 */ }</code></td>
+        </tr>
+        <tr>
+            <td><code>.alt</code></td>
+            <td><code>if (event.altKey) { /* 处理 */ }</code></td>
+        </tr>
+        </tbody></table>
+    <h2>⚡ 高级特性对照</h2>
+    <h3>计算属性 (computed)</h3>
+    <pre><code class="language-javascript">// Vue写法
+computed: {
+  fullName() {
+    return this.firstName + ' ' + this.lastName;
+  }
+}
+
+// JavaScript实现
+let _firstName = '';
+let _lastName = '';
+let _fullName = '';
+
+Object.defineProperty(obj, 'firstName', {
+  get() { return _firstName; },
+  set(value) {
+    _firstName = value;
+    updateFullName();
+  }
+});
+
+function updateFullName() {
+  _fullName = _firstName + ' ' + _lastName;
+  // 更新相关DOM
+}
+</code></pre>
+    <h3>侦听器 (watch)</h3>
+    <pre><code class="language-javascript">// Vue写法
+watch: {
+  message(newVal, oldVal) {
+    console.log(`消息从 ${oldVal} 变为 ${newVal}`);
+  }
+}
+
+// JavaScript实现
+let _message = '';
+Object.defineProperty(obj, 'message', {
+  get() { return _message; },
+  set(newVal) {
+    const oldVal = _message;
+    _message = newVal;
+    console.log(`消息从 ${oldVal} 变为 ${newVal}`);
+  }
+});
+</code></pre>
+    <h3>生命周期钩子</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Vue生命周期</th>
+            <th>JavaScript等价时机</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td><code>created</code></td>
+            <td>对象/函数初始化完成后</td>
+        </tr>
+        <tr>
+            <td><code>mounted</code></td>
+            <td><code>DOMContentLoaded</code> 或 <code>window.onload</code></td>
+        </tr>
+        <tr>
+            <td><code>updated</code></td>
+            <td>DOM更新操作后的回调</td>
+        </tr>
+        <tr>
+            <td><code>destroyed</code></td>
+            <td>手动清理事件监听器、定时器等</td>
+        </tr>
+        </tbody></table>
+    <h2>🚀 性能对比</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>方面</th>
+            <th>Vue</th>
+            <th>原生JavaScript</th>
+        </tr>
+        </thead>
+        <tbody><tr>
+            <td>开发效率</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐</td>
+        </tr>
+        <tr>
+            <td>运行性能</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+        </tr>
+        <tr>
+            <td>包大小</td>
+            <td>较大（框架开销）</td>
+            <td>最小</td>
+        </tr>
+        <tr>
+            <td>学习曲线</td>
+            <td>较陡峭</td>
+            <td>基础必须</td>
+        </tr>
+        <tr>
+            <td>维护性</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+        </tr>
+        <tr>
+            <td>调试难度</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐</td>
+        </tr>
+        </tbody></table>
+    <h2>🎯 学习建议</h2>
+    <ol>
+        <li><p><strong>先掌握JavaScript基础</strong></p>
+            <ul>
+                <li>DOM操作、事件处理</li>
+                <li>异步编程、模块化</li>
+                <li>ES6+语法特性</li>
+            </ul>
+        </li>
+        <li><p><strong>理解Vue的核心原理</strong></p>
+            <ul>
+                <li>响应式系统实现</li>
+                <li>虚拟DOM概念</li>
+                <li>组件通信机制</li>
+            </ul>
+        </li>
+        <li><p><strong>实践项目</strong></p>
+            <ul>
+                <li>先用原生JS实现功能</li>
+                <li>再用Vue重构对比</li>
+                <li>理解两者优缺点</li>
+            </ul>
+        </li>
+        <li><p><strong>性能优化</strong></p>
+            <ul>
+                <li>了解何时用Vue，何时用原生</li>
+                <li>避免过度工程化</li>
+                <li>选择合适的技术栈</li>
+            </ul>
+        </li>
+    </ol>
+    <h2>总结</h2>
+    <p>Vue指令是原生JavaScript的<strong>语法糖</strong>，它们在底层都转换为标准的DOM操作。理解这种映射关系有助于：</p>
+    <ul>
+        <li>🔍 更好地调试Vue应用</li>
+        <li>📈 优化性能瓶颈</li>
+        <li>🛠️ 选择合适的技术方案</li>
+        <li>💡 深入理解框架原理</li>
+    </ul>
+    <p>掌握原生JavaScript是学习任何前端框架的基础！[[<a href="url"></a><a href="url"></a>](url)](url)## 欢迎使用 Markdown 编辑器！</p>
+    <p>这是一个<strong>功能强大</strong>的 <em>Markdown</em> 编辑器，支持实时预览。</p>
+    <h3>主要特性</h3>
+    <ul>
+        <li>✨ 实时预览</li>
+        <li>🎨 语法高亮</li>
+        <li>📱 响应式设计</li>
+        <li>🚀 快速便捷</li>
+    </ul>
+    <h3>代码示例</h3>
+    <pre><code class="language-javascript">function hello() {
+    console.log("Hello, Markdown!");
+}
+</code></pre>
+    <blockquote>
+        <p>提示：您可以使用工具栏快速插入Markdown语法。</p>
+    </blockquote>
+    <p>开始编写您的内容吧！</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="1000" height="600" fill="#1e293b"/>
+  
+  <!-- 标题 -->
+  <text x="500" y="40" text-anchor="middle" font-size="28" font-weight="bold" fill="white">Vue三大核心语法对比</text>
+  
+  <!-- {{ }} 区域 -->
+  <rect x="50" y="80" width="280" height="480" fill="#064e3b" stroke="#10b981" stroke-width="2" rx="10"/>
+  
+  <!-- {{ }} 标题 -->
+  <rect x="70" y="100" width="240" height="50" fill="#10b981" rx="8"/>
+  <text x="190" y="125" text-anchor="middle" font-size="20" font-weight="bold" fill="white">{{ }}</text>
+  <text x="190" y="142" text-anchor="middle" font-size="12" fill="#d1fae5">插值语法 - 显示内容</text>
+  
+  <!-- {{ }} 示例 -->
+  <text x="70" y="175" font-size="12" font-weight="bold" fill="#34d399">Vue写法:</text>
+  <rect x="70" y="180" width="240" height="20" fill="rgba(16, 185, 129, 0.2)" rx="3"/>
+  <text x="75" y="194" font-size="11" fill="#a7f3d0">{{ message }}</text>
+  
+  <text x="70" y="215" font-size="12" font-weight="bold" fill="#fbbf24">JavaScript等价:</text>
+  <rect x="70" y="220" width="240" height="20" fill="rgba(245, 158, 11, 0.2)" rx="3"/>
+  <text x="75" y="234" font-size="10" fill="#fcd34d">element.textContent = message</text>
+  
+  <text x="70" y="260" font-size="12" font-weight="bold" fill="#34d399">更多示例:</text>
+  <text x="75" y="280" font-size="10" fill="#a7f3d0">{{ user.name }}</text>
+  <text x="75" y="295" font-size="10" fill="#a7f3d0">{{ price * quantity }}</text>
+  <text x="75" y="310" font-size="10" fill="#a7f3d0">{{ age >= 18 ? '成年' : '未成年' }}</text>
+  <text x="75" y="325" font-size="10" fill="#a7f3d0">{{ formatDate() }}</text>
+  
+  <text x="70" y="350" font-size="12" font-weight="bold" fill="#34d399">使用场景:</text>
+  <text x="75" y="370" font-size="10" fill="#6ee7b7">✓ 显示文本和标题</text>
+  <text x="75" y="385" font-size="10" fill="#6ee7b7">✓ 用户信息展示</text>
+  <text x="75" y="400" font-size="10" fill="#6ee7b7">✓ 计算结果显示</text>
+  <text x="75" y="415" font-size="10" fill="#6ee7b7">✓ 条件内容渲染</text>
+  
+  <rect x="70" y="430" width="240" height="40" fill="rgba(16, 185, 129, 0.3)" rx="5"/>
+  <text x="190" y="445" text-anchor="middle" font-size="10" font-weight="bold" fill="#d1fae5">只能用于标签内容</text>
+  <text x="190" y="458" text-anchor="middle" font-size="10" fill="#a7f3d0">不能用于HTML属性</text>
+  
+  <!-- : 区域 -->
+  <rect x="360" y="80" width="280" height="480" fill="#92400e" stroke="#f59e0b" stroke-width="2" rx="10"/>
+  
+  <!-- : 标题 -->
+  <rect x="380" y="100" width="240" height="50" fill="#f59e0b" rx="8"/>
+  <text x="500" y="125" text-anchor="middle" font-size="20" font-weight="bold" fill="white">:</text>
+  <text x="500" y="142" text-anchor="middle" font-size="12" fill="#fef3c7">属性绑定 - 设置属性</text>
+  
+  <!-- : 示例 -->
+  <text x="380" y="175" font-size="12" font-weight="bold" fill="#fbbf24">Vue写法:</text>
+  <rect x="380" y="180" width="240" height="20" fill="rgba(245, 158, 11, 0.2)" rx="3"/>
+  <text x="385" y="194" font-size="11" fill="#fcd34d">:src="imageUrl"</text>
+  
+  <text x="380" y="215" font-size="12" font-weight="bold" fill="#10b981">JavaScript等价:</text>
+  <rect x="380" y="220" width="240" height="20" fill="rgba(16, 185, 129, 0.2)" rx="3"/>
+  <text x="385" y="234" font-size="10" fill="#34d399">img.src = imageUrl</text>
+  
+  <text x="380" y="260" font-size="12" font-weight="bold" fill="#fbbf24">更多示例:</text>
+  <text x="385" y="280" font-size="10" fill="#fcd34d">:class="cssClass"</text>
+  <text x="385" y="295" font-size="10" fill="#fcd34d">:disabled="isLoading"</text>
+  <text x="385" y="310" font-size="10" fill="#fcd34d">:style="{ color: red }"</text>
+  <text x="385" y="325" font-size="10" fill="#fcd34d">:href="linkUrl"</text>
+  
+  <text x="380" y="350" font-size="12" font-weight="bold" fill="#fbbf24">使用场景:</text>
+  <text x="385" y="370" font-size="10" fill="#fed7aa">✓ 动态图片和链接</text>
+  <text x="385" y="385" font-size="10" fill="#fed7aa">✓ 条件样式切换</text>
+  <text x="385" y="400" font-size="10" fill="#fed7aa">✓ 表单状态控制</text>
+  <text x="385" y="415" font-size="10" fill="#fed7aa">✓ 主题皮肤系统</text>
+  
+  <rect x="380" y="430" width="240" height="40" fill="rgba(245, 158, 11, 0.3)" rx="5"/>
+  <text x="500" y="445" text-anchor="middle" font-size="10" font-weight="bold" fill="#fef3c7">v-bind: 的简写</text>
+  <text x="500" y="458" text-anchor="middle" font-size="10" fill="#fcd34d">专门用于HTML属性</text>
+  
+  <!-- @ 区域 -->
+  <rect x="670" y="80" width="280" height="480" fill="#164e63" stroke="#0891b2" stroke-width="2" rx="10"/>
+  
+  <!-- @ 标题 -->
+  <rect x="690" y="100" width="240" height="50" fill="#0891b2" rx="8"/>
+  <text x="810" y="125" text-anchor="middle" font-size="20" font-weight="bold" fill="white">@</text>
+  <text x="810" y="142" text-anchor="middle" font-size="12" fill="#cffafe">事件监听 - 处理交互</text>
+  
+  <!-- @ 示例 -->
+  <text x="690" y="175" font-size="12" font-weight="bold" fill="#67e8f9">Vue写法:</text>
+  <rect x="690" y="180" width="240" height="20" fill="rgba(6, 182, 212, 0.2)" rx="3"/>
+  <text x="695" y="194" font-size="11" fill="#67e8f9">@click="handleClick"</text>
+  
+  <text x="690" y="215" font-size="12" font-weight="bold" fill="#10b981">JavaScript等价:</text>
+  <rect x="690" y="220" width="240" height="20" fill="rgba(16, 185, 129, 0.2)" rx="3"/>
+  <text x="695" y="234" font-size="9" fill="#34d399">addEventListener('click', handleClick)</text>
+  
+  <text x="690" y="260" font-size="12" font-weight="bold" fill="#67e8f9">更多示例:</text>
+  <text x="695" y="280" font-size="10" fill="#67e8f9">@input="onInput"</text>
+  <text x="695" y="295" font-size="10" fill="#67e8f9">@keyup.enter="search"</text>
+  <text x="695" y="310" font-size="10" fill="#67e8f9">@submit.prevent="onSubmit"</text>
+  <text x="695" y="325" font-size="10" fill="#67e8f9">@click.stop="onClick"</text>
+  
+  <text x="690" y="350" font-size="12" font-weight="bold" fill="#67e8f9">使用场景:</text>
+  <text x="695" y="370" font-size="10" fill="#a5f3fc">✓ 按钮点击处理</text>
+  <text x="695" y="385" font-size="10" fill="#a5f3fc">✓ 表单提交验证</text>
+  <text x="695" y="400" font-size="10" fill="#a5f3fc">✓ 键盘快捷键</text>
+  <text x="695" y="415" font-size="10" fill="#a5f3fc">✓ 鼠标交互事件</text>
+  
+  <rect x="690" y="430" width="240" height="40" fill="rgba(6, 182, 212, 0.3)" rx="5"/>
+  <text x="810" y="445" text-anchor="middle" font-size="10" font-weight="bold" fill="#cffafe">v-on: 的简写</text>
+  <text x="810" y="458" text-anchor="middle" font-size="10" fill="#67e8f9">支持修饰符语法</text>
+  
+  <!-- 底部总结 -->
+  <rect x="50" y="570" width="900" height="25" fill="rgba(255,255,255,0.1)" rx="5"/>
+  <text x="190" y="585" text-anchor="middle" font-size="12" fill="#10b981">{{ }} 显示内容</text>
+  <text x="500" y="585" text-anchor="middle" font-size="12" fill="#f59e0b">: 绑定属性</text>
+  <text x="810" y="585" text-anchor="middle" font-size="12" fill="#0891b2">@ 监听事件</text>
+</svg>

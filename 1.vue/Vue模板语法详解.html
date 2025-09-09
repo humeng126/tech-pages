@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue模板语法详解</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .syntax-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .syntax-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .code-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+        .vue-panel {
+            border-left-color: #10b981;
+        }
+        .js-panel {
+            border-left-color: #f59e0b;
+        }
+        .result-panel {
+            border-left-color: #8b5cf6;
+        }
+        .panel-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .vue-header { color: #34d399; }
+        .js-header { color: #fbbf24; }
+        .result-header { color: #a78bfa; }
+        
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        .highlight {
+            background: rgba(251, 191, 36, 0.3);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .demo-area {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .demo-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .demo-btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .demo-result {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 120px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .syntax-note {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .syntax-note h4 {
+            margin: 0 0 10px 0;
+            color: #60a5fa;
+        }
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .example-table th,
+        .example-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .example-table th {
+            background: rgba(255,255,255,0.1);
+            font-weight: bold;
+        }
+        .inline-code {
+            background: rgba(0,0,0,0.3);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Vue模板语法详解</h1>
+        
+        <!-- {{ }} 插值语法 -->
+        <div class="syntax-section">
+            <div class="syntax-title">
+                📝 {{ }} - 插值语法（文本插值）
+            </div>
+            
+            <div class="syntax-note">
+                <h4>💡 作用</h4>
+                <p><span class="inline-code">{{ }}</span> 用于在HTML模板中显示JavaScript表达式的结果，类似于模板字符串的 <span class="inline-code">${}</span></p>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="code-panel vue-panel">
+                    <div class="panel-header vue-header">Vue模板写法</div>
+                    <pre><code>&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;<span class="highlight">{{ message }}</span>&lt;/h1&gt;
+    &lt;p&gt;用户名: <span class="highlight">{{ user.name }}</span>&lt;/p&gt;
+    &lt;p&gt;年龄: <span class="highlight">{{ user.age }}</span> 岁&lt;/p&gt;
+    &lt;p&gt;总价: <span class="highlight">{{ price * quantity }}</span> 元&lt;/p&gt;
+    &lt;p&gt;问候: <span class="highlight">{{ greeting() }}</span>&lt;/p&gt;
+    &lt;p&gt;时间: <span class="highlight">{{ new Date().toLocaleString() }}</span>&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  data() {
+    return {
+      message: '欢迎使用Vue!',
+      user: { name: '张三', age: 25 },
+      price: 99,
+      quantity: 2
+    }
+  },
+  methods: {
+    greeting() {
+      return `你好, ${this.user.name}!`;
+    }
+  }
+}
+&lt;/script&gt;</code></pre>
+                </div>
+                
+                <div class="code-panel js-panel">
+                    <div class="panel-header js-header">原生JavaScript等价</div>
+                    <pre><code>// 数据
+const data = {
+  message: '欢迎使用Vue!',
+  user: { name: '张三', age: 25 },
+  price: 99,
+  quantity: 2
+};
+
+function greeting() {
+  return `你好, ${data.user.name}!`;
+}
+
+// 手动更新DOM内容
+function updateDOM() {
+  <span class="highlight">document.querySelector('h1').textContent = data.message;</span>
+  
+  <span class="highlight">document.querySelector('.username').textContent = 
+    `用户名: ${data.user.name}`;</span>
+  
+  <span class="highlight">document.querySelector('.age').textContent = 
+    `年龄: ${data.user.age} 岁`;</span>
+  
+  <span class="highlight">document.querySelector('.total').textContent = 
+    `总价: ${data.price * data.quantity} 元`;</span>
+  
+  <span class="highlight">document.querySelector('.greeting').textContent = 
+    `问候: ${greeting()}`;</span>
+  
+  <span class="highlight">document.querySelector('.time').textContent = 
+    `时间: ${new Date().toLocaleString()}`;</span>
+}
+
+// 数据变化时需要手动调用
+updateDOM();</code></pre>
+                </div>
+                
+                <div class="code-panel result-panel">
+                    <div class="panel-header result-header">渲染结果</div>
+                    <pre><code>&lt;div&gt;
+  &lt;h1&gt;<span class="highlight">欢迎使用Vue!</span>&lt;/h1&gt;
+  &lt;p&gt;用户名: <span class="highlight">张三</span>&lt;/p&gt;
+  &lt;p&gt;年龄: <span class="highlight">25</span> 岁&lt;/p&gt;
+  &lt;p&gt;总价: <span class="highlight">198</span> 元&lt;/p&gt;
+  &lt;p&gt;问候: <span class="highlight">你好, 张三!</span>&lt;/p&gt;
+  &lt;p&gt;时间: <span class="highlight">2024/1/15 下午2:30:45</span>&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+            </div>
+            
+            <table class="example-table">
+                <thead>
+                    <tr>
+                        <th>{{ }} 支持的内容</th>
+                        <th>示例</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>变量</td>
+                        <td><code>{{ message }}</code></td>
+                        <td>显示data中的变量</td>
+                    </tr>
+                    <tr>
+                        <td>对象属性</td>
+                        <td><code>{{ user.name }}</code></td>
+                        <td>访问对象的属性</td>
+                    </tr>
+                    <tr>
+                        <td>数组元素</td>
+                        <td><code>{{ items[0] }}</code></td>
+                        <td>访问数组的元素</td>
+                    </tr>
+                    <tr>
+                        <td>表达式计算</td>
+                        <td><code>{{ price * quantity }}</code></td>
+                        <td>进行数学运算</td>
+                    </tr>
+                    <tr>
+                        <td>方法调用</td>
+                        <td><code>{{ formatDate() }}</code></td>
+                        <td>调用methods中的方法</td>
+                    </tr>
+                    <tr>
+                        <td>三元运算符</td>
+                        <td><code>{{ age >= 18 ? '成年' : '未成年' }}</code></td>
+                        <td>条件判断</td>
+                    </tr>
+                    <tr>
+                        <td>JavaScript内置对象</td>
+                        <td><code>{{ Math.round(price) }}</code></td>
+                        <td>使用JS原生方法</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- : 属性绑定 -->
+        <div class="syntax-section">
+            <div class="syntax-title">
+                🔗 : - 属性绑定（v-bind简写）
+            </div>
+            
+            <div class="syntax-note">
+                <h4>💡 作用</h4>
+                <p><span class="inline-code">:</span> 是 <span class="inline-code">v-bind:</span> 的简写，用于动态绑定HTML属性的值</p>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="code-panel vue-panel">
+                    <div class="panel-header vue-header">Vue属性绑定</div>
+                    <pre><code>&lt;template&gt;
+  &lt;div&gt;
+    &lt;!-- 图片源绑定 --&gt;
+    &lt;img <span class="highlight">:src="imageUrl"</span> <span class="highlight">:alt="imageAlt"</span> /&gt;
+    
+    &lt;!-- CSS类绑定 --&gt;
+    &lt;div <span class="highlight">:class="cssClasses"</span>&gt;动态样式&lt;/div&gt;
+    &lt;div <span class="highlight">:class="{ active: isActive, disabled: isDisabled }"</span>&gt;
+      条件样式
+    &lt;/div&gt;
+    
+    &lt;!-- 内联样式绑定 --&gt;
+    &lt;p <span class="highlight">:style="{ color: textColor, fontSize: textSize + 'px' }"</span>&gt;
+      动态样式
+    &lt;/p&gt;
+    
+    &lt;!-- 表单属性绑定 --&gt;
+    &lt;input <span class="highlight">:value="inputValue"</span> <span class="highlight">:disabled="isFormDisabled"</span> /&gt;
+    
+    &lt;!-- 链接绑定 --&gt;
+    &lt;a <span class="highlight">:href="linkUrl"</span> <span class="highlight">:target="linkTarget"</span>&gt;点击链接&lt;/a&gt;
+    
+    &lt;!-- 自定义属性 --&gt;
+    &lt;div <span class="highlight">:data-id="userId"</span> <span class="highlight">:title="tooltipText"</span>&gt;
+      用户信息
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  data() {
+    return {
+      imageUrl: '/avatar.jpg',
+      imageAlt: '用户头像',
+      cssClasses: 'container active',
+      isActive: true,
+      isDisabled: false,
+      textColor: '#ff6b6b',
+      textSize: 18,
+      inputValue: '初始值',
+      isFormDisabled: false,
+      linkUrl: 'https://example.com',
+      linkTarget: '_blank',
+      userId: 123,
+      tooltipText: '这是提示信息'
+    }
+  }
+}
+&lt;/script&gt;</code></pre>
+                </div>
+                
+                <div class="code-panel js-panel">
+                    <div class="panel-header js-header">原生JavaScript等价</div>
+                    <pre><code>// 数据
+const data = {
+  imageUrl: '/avatar.jpg',
+  imageAlt: '用户头像',
+  cssClasses: 'container active',
+  isActive: true,
+  isDisabled: false,
+  textColor: '#ff6b6b',
+  textSize: 18,
+  inputValue: '初始值',
+  isFormDisabled: false,
+  linkUrl: 'https://example.com',
+  linkTarget: '_blank',
+  userId: 123,
+  tooltipText: '这是提示信息'
+};
+
+// 手动设置属性
+function bindAttributes() {
+  const img = document.querySelector('img');
+  <span class="highlight">img.src = data.imageUrl;
+  img.alt = data.imageAlt;</span>
+  
+  const dynamicDiv = document.querySelector('.dynamic');
+  <span class="highlight">dynamicDiv.className = data.cssClasses;</span>
+  
+  const conditionalDiv = document.querySelector('.conditional');
+  <span class="highlight">conditionalDiv.className = '';
+  if (data.isActive) conditionalDiv.classList.add('active');
+  if (data.isDisabled) conditionalDiv.classList.add('disabled');</span>
+  
+  const styledP = document.querySelector('p');
+  <span class="highlight">styledP.style.color = data.textColor;
+  styledP.style.fontSize = data.textSize + 'px';</span>
+  
+  const input = document.querySelector('input');
+  <span class="highlight">input.value = data.inputValue;
+  input.disabled = data.isFormDisabled;</span>
+  
+  const link = document.querySelector('a');
+  <span class="highlight">link.href = data.linkUrl;
+  link.target = data.linkTarget;</span>
+  
+  const userDiv = document.querySelector('.user-info');
+  <span class="highlight">userDiv.setAttribute('data-id', data.userId);
+  userDiv.title = data.tooltipText;</span>
+}
+
+// 数据变化时需要手动调用
+bindAttributes();</code></pre>
+                </div>
+                
+                <div class="code-panel result-panel">
+                    <div class="panel-header result-header">生成的HTML</div>
+                    <pre><code>&lt;div&gt;
+  &lt;img <span class="highlight">src="/avatar.jpg"</span> <span class="highlight">alt="用户头像"</span> /&gt;
+  
+  &lt;div <span class="highlight">class="container active"</span>&gt;动态样式&lt;/div&gt;
+  &lt;div <span class="highlight">class="active"</span>&gt;条件样式&lt;/div&gt;
+  
+  &lt;p <span class="highlight">style="color: #ff6b6b; font-size: 18px;"</span>&gt;
+    动态样式
+  &lt;/p&gt;
+  
+  &lt;input <span class="highlight">value="初始值"</span> /&gt;
+  
+  &lt;a <span class="highlight">href="https://example.com"</span> <span class="highlight">target="_blank"</span>&gt;
+    点击链接
+  &lt;/a&gt;
+  
+  &lt;div <span class="highlight">data-id="123"</span> <span class="highlight">title="这是提示信息"</span>&gt;
+    用户信息
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+            </div>
+            
+            <table class="example-table">
+                <thead>
+                    <tr>
+                        <th>绑定类型</th>
+                        <th>Vue写法</th>
+                        <th>完整写法</th>
+                        <th>JavaScript等价</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>属性绑定</td>
+                        <td><code>:src="url"</code></td>
+                        <td><code>v-bind:src="url"</code></td>
+                        <td><code>element.src = url</code></td>
+                    </tr>
+                    <tr>
+                        <td>类绑定</td>
+                        <td><code>:class="className"</code></td>
+                        <td><code>v-bind:class="className"</code></td>
+                        <td><code>element.className = className</code></td>
+                    </tr>
+                    <tr>
+                        <td>样式绑定</td>
+                        <td><code>:style="styleObj"</code></td>
+                        <td><code>v-bind:style="styleObj"</code></td>
+                        <td><code>Object.assign(element.style, styleObj)</code></td>
+                    </tr>
+                    <tr>
+                        <td>布尔属性</td>
+                        <td><code>:disabled="isDisabled"</code></td>
+                        <td><code>v-bind:disabled="isDisabled"</code></td>
+                        <td><code>element.disabled = isDisabled</code></td>
+                    </tr>
+                    <tr>
+                        <td>自定义属性</td>
+                        <td><code>:data-id="id"</code></td>
+                        <td><code>v-bind:data-id="id"</code></td>
+                        <td><code>element.setAttribute('data-id', id)</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 实际演示 -->
+        <div class="syntax-section">
+            <div class="syntax-title">
+                🎮 实际演示
+            </div>
+            
+            <div class="demo-area">
+                <div class="demo-controls">
+                    <button class="demo-btn" onclick="demoInterpolation()">演示 {{ }} 插值</button>
+                    <button class="demo-btn" onclick="demoBinding()">演示 : 属性绑定</button>
+                    <button class="demo-btn" onclick="demoBoth()">演示两者结合</button>
+                    <button class="demo-btn" onclick="resetDemo()">重置</button>
+                </div>
+                <div class="demo-result" id="demo-area">
+                    点击上方按钮查看实际效果...
+                </div>
+            </div>
+        </div>
+
+        <!-- 重要注意事项 -->
+        <div class="syntax-section">
+            <div class="syntax-title">
+                ⚠️ 重要注意事项
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+                <div style="background: rgba(239, 68, 68, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #ef4444;">
+                    <h4 style="color: #f87171; margin-top: 0;">❌ 常见错误</h4>
+                    <ul style="margin: 0;">
+                        <li><code>{{ }}</code> 不能用在HTML属性中</li>
+                        <li><code>:onclick</code> 是错误的，应该用 <code>@click</code></li>
+                        <li><code>{{ }}</code> 中不能写复杂的语句</li>
+                        <li>不要在 <code>{{ }}</code> 中修改数据</li>
+                    </ul>
+                </div>
+                
+                <div style="background: rgba(34, 197, 94, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #22c55e;">
+                    <h4 style="color: #4ade80; margin-top: 0;">✅ 正确用法</h4>
+                    <ul style="margin: 0;">
+                        <li><code>{{ message }}</code> - 显示文本</li>
+                        <li><code>:src="imageUrl"</code> - 绑定属性</li>
+                        <li><code>{{ user.name.toUpperCase() }}</code> - 简单表达式</li>
+                        <li>使用computed计算复杂逻辑</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 20px; margin-top: 20px; border-radius: 0 12px 12px 0;">
+                <h4 style="color: #60a5fa; margin: 0 0 15px 0;">🚀 总结对比</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h5 style="color: #34d399; margin: 0 0 10px 0;">{{ }} 插值语法</h5>
+                        <p style="margin: 0; font-size: 0.9em;">用于显示数据内容，相当于JavaScript中的模板字符串或textContent赋值</p>
+                    </div>
+                    <div>
+                        <h5 style="color: #fbbf24; margin: 0 0 10px 0;">: 属性绑定</h5>
+                        <p style="margin: 0; font-size: 0.9em;">用于动态设置HTML属性，相当于JavaScript中的setAttribute或属性赋值</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let demoData = {
+            userName: '小明',
+            age: 25,
+            avatar: '👨‍💻',
+            isVip: true,
+            score: 88,
+            theme: 'blue'
+        };
+
+        function demoInterpolation() {
+            const demo = document.getElementById('demo-area');
+            demo.innerHTML = `
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #10b981;">
+                    <h4 style="color: #34d399; margin: 0 0 15px 0;">🎯 {{ }} 插值语法演示</h4>
+                    <div style="display: grid; gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 6px;">
+                            <strong>Vue写法:</strong> <code>{{ userName }}</code><br>
+                            <strong>显示结果:</strong> <span style="color: #34d399;">${demoData.userName}</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 6px;">
+                            <strong>Vue写法:</strong> <code>{{ age >= 18 ? '成年人' : '未成年' }}</code><br>
+                            <strong>显示结果:</strong> <span style="color: #34d399;">${demoData.age >= 18 ? '成年人' : '未成年'}</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 6px;">
+                            <strong>Vue写法:</strong> <code>{{ score + '分' }}</code><br>
+                            <strong>显示结果:</strong> <span style="color: #34d399;">${demoData.score + '分'}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 12px; background: rgba(52, 211, 153, 0.1); border-radius: 6px;">
+                        <small style="color: #6ee7b7;">💡 {{ }} 会自动将JavaScript表达式的结果转换为文本显示</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        function demoBinding() {
+            const demo = document.getElementById('demo-area');
+            const themeColors = {
+                blue: '#3b82f6',
+                green: '#10b981',
+                red: '#ef4444'
+            };
+            
+            demo.innerHTML = `
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #f59e0b;">
+                    <h4 style="color: #fbbf24; margin: 0 0 15px 0;">🔗 : 属性绑定演示</h4>
+                    <div style="display: grid; gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 6px;">
+                            <strong>Vue写法:</strong> <code>:style="{ color: '${themeColors[demoData.theme]}' }"</code><br>
+                            <strong>渲染结果:</strong> <span style="color: ${themeColors[demoData.theme]};">这段文字是动态颜色</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 6px;">
+                            <strong>Vue写法:</strong> <code>:class="{ vip: ${demoData.isVip} }"</code><br>
+                            <strong>渲染结果:</strong> <span class="${demoData.isVip ? 'vip' : ''}" style="color: ${demoData.isVip ? '#fbbf24' : '#94a3b8'}; font-weight: ${demoData.isVip ? 'bold' : 'normal'};">
+                                ${demoData.isVip ? '⭐ VIP用户' : '👤 普通用户'}
+                            </span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 6px;">
+                            <strong>Vue写法:</strong> <code>:title="'用户: ' + userName"</code><br>
+                            <strong>渲染结果:</strong> <span title="用户: ${demoData.userName}" style="border-bottom: 1px dashed #fbbf24; cursor: help;">
+                                鼠标悬停查看tooltip
+                            </span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 12px; background: rgba(245, 158, 11, 0.1); border-radius: 6px;">
+                        <small style="color: #fcd34d;">🔧 : 会将JavaScript表达式的结果绑定到HTML属性上</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        function demoBoth() {
+            const demo = document.getElementById('demo-area');
+            const currentTime = new Date().toLocaleTimeString();
+            
+            demo.innerHTML = `
+                <div style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #8b5cf6;">
+                    <h4 style="color: #a78bfa; margin: 0 0 15px 0;">🎨 {{ }} 和 : 结合使用</h4>
+                    <div style="display: grid; gap: 15px;">
+                        <!-- 用户卡片示例 -->
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="font-size: 2em;">${demoData.avatar}</span>
+                                <div>
+                                    <div style="font-size: 1.2em; font-weight: bold; color: #a78bfa;">
+                                        ${demoData.userName}
+                                    </div>
+                                    <div style="font-size: 0.9em; color: #c4b5fd;">
+                                        ${demoData.age}岁 | ${demoData.isVip ? 'VIP会员' : '普通用户'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(139, 92, 246, 0.2); padding: 8px; border-radius: 4px; text-align: center;">
+                                <span style="color: #ddd6fe;">积分: ${demoData.score}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 对应的Vue代码 -->
+                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; line-height: 1.5;">
+                            <div style="color: #34d399; margin-bottom: 8px;">Vue模板代码:</div>
+                            <div style="color: #e5e7eb;">&lt;div <span style="color: #fbbf24;">:class="{ 'vip-card': isVip }"</span>&gt;</div>
+                            <div style="color: #e5e7eb;">&nbsp;&nbsp;&lt;span&gt;<span style="color: #a78bfa;">{{ avatar }}</span>&lt;/span&gt;</div>
+                            <div style="color: #e5e7eb;">&nbsp;&nbsp;&lt;h3&gt;<span style="color: #a78bfa;">{{ userName }}</span>&lt;/h3&gt;</div>
+                            <div style="color: #e5e7eb;">&nbsp;&nbsp;&lt;p&gt;<span style="color: #a78bfa;">{{ age }}</span>岁 | <span style="color: #a78bfa;">{{ isVip ? 'VIP会员' : '普通用户' }}</span>&lt;/p&gt;</div>
+                            <div style="color: #e5e7eb;">&nbsp;&nbsp;&lt;div <span style="color: #fbbf24;">:style="{ backgroundColor: theme }"</span>&gt;</div>
+                            <div style="color: #e5e7eb;">&nbsp;&nbsp;&nbsp;&nbsp;积分: <span style="color: #a78bfa;">{{ score }}</span></div>
+                            <div style="color: #e5e7eb;">&nbsp;&nbsp;&lt;/div&gt;</div>
+                            <div style="color: #e5e7eb;">&lt;/div&gt;</div>
+                        </div>
+                        
+                        <!-- 生成时间 -->
+                        <div style="text-align: center; color: #9ca3af; font-size: 0.8em;">
+                            生成时间: ${currentTime}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetDemo() {
+            const demo = document.getElementById('demo-area');
+            demo.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #9ca3af;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">🎯</div>
+                    <h4 style="margin: 0 0 10px 0;">准备就绪</h4>
+                    <p style="margin: 0;">点击上方按钮体验Vue模板语法的实际效果</p>
+                </div>
+            `;
+        }
+
+        // 页面加载时重置演示
+        window.addEventListener('DOMContentLoaded', resetDemo);
+    </script>
+</body>
+</html>
