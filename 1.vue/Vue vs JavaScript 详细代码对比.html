@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue vs JavaScript 对比</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .vue-section {
+            background: linear-gradient(135deg, #4ade80, #16a34a);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(74, 222, 128, 0.3);
+        }
+        .js-section {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+        }
+        .section-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .vue-section .section-title::before {
+            background: rgba(255,255,255,0.3);
+        }
+        .js-section .section-title::before {
+            background: rgba(255,255,255,0.3);
+        }
+        .code-block {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        .example-title {
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            font-size: 1.1em;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 5px;
+        }
+        .demo-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .demo-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .demo-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .vue-btn {
+            background: #4ade80;
+            color: white;
+        }
+        .js-btn {
+            background: #f59e0b;
+            color: white;
+        }
+        #demo-result {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 2px solid #e2e8f0;
+            min-height: 50px;
+        }
+        .highlight {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vue指令 vs 原生JavaScript</h1>
+        
+        <!-- v-bind 对比 -->
+        <div class="comparison">
+            <div class="vue-section">
+                <div class="section-title">Vue.js - v-bind</div>
+                <div class="example-title">1. 属性绑定</div>
+                <div class="code-block">
+&lt;!-- Vue模板 --&gt;
+&lt;img <span class="highlight">v-bind:src="imageUrl"</span> alt="图片" /&gt;
+&lt;div <span class="highlight">:class="cssClass"</span>&gt;动态样式&lt;/div&gt;
+&lt;button <span class="highlight">:disabled="isDisabled"</span>&gt;按钮&lt;/button&gt;
+
+&lt;!-- 数据 --&gt;
+data() {
+  return {
+    imageUrl: '/path/to/image.jpg',
+    cssClass: 'active',
+    isDisabled: true
+  }
+}
+                </div>
+            </div>
+            
+            <div class="js-section">
+                <div class="section-title">原生JavaScript</div>
+                <div class="example-title">setAttribute / 属性赋值</div>
+                <div class="code-block">
+// 获取元素
+const img = document.querySelector('img');
+const div = document.querySelector('div');
+const button = document.querySelector('button');
+
+// 设置属性
+<span class="highlight">img.setAttribute('src', imageUrl);</span>
+// 或者: img.src = imageUrl;
+
+<span class="highlight">div.className = cssClass;</span>
+// 或者: div.setAttribute('class', cssClass);
+
+<span class="highlight">button.disabled = isDisabled;</span>
+// 或者: button.setAttribute('disabled', isDisabled);
+                </div>
+            </div>
+        </div>
+
+        <!-- v-on 对比 -->
+        <div class="comparison">
+            <div class="vue-section">
+                <div class="section-title">Vue.js - v-on</div>
+                <div class="example-title">2. 事件监听</div>
+                <div class="code-block">
+&lt;!-- Vue模板 --&gt;
+&lt;button <span class="highlight">v-on:click="handleClick"</span>&gt;点击&lt;/button&gt;
+&lt;button <span class="highlight">@click="handleClick"</span>&gt;简写&lt;/button&gt;
+&lt;input <span class="highlight">@keyup.enter="onEnter"</span> /&gt;
+&lt;form <span class="highlight">@submit.prevent="onSubmit"</span>&gt;&lt;/form&gt;
+
+&lt;!-- 方法 --&gt;
+methods: {
+  handleClick(event) {
+    console.log('按钮被点击', event);
+  },
+  onEnter() { /* ... */ },
+  onSubmit() { /* ... */ }
+}
+                </div>
+            </div>
+            
+            <div class="js-section">
+                <div class="section-title">原生JavaScript</div>
+                <div class="example-title">addEventListener</div>
+                <div class="code-block">
+// 获取元素
+const button = document.querySelector('button');
+const input = document.querySelector('input');
+const form = document.querySelector('form');
+
+// 添加事件监听
+<span class="highlight">button.addEventListener('click', handleClick);</span>
+
+<span class="highlight">input.addEventListener('keyup', function(e) {
+  if (e.key === 'Enter') {
+    onEnter();
+  }
+});</span>
+
+<span class="highlight">form.addEventListener('submit', function(e) {
+  e.preventDefault(); // 阻止默认行为
+  onSubmit();
+});</span>
+
+function handleClick(event) {
+  console.log('按钮被点击', event);
+}
+                </div>
+            </div>
+        </div>
+
+        <!-- v-if 对比 -->
+        <div class="comparison">
+            <div class="vue-section">
+                <div class="section-title">Vue.js - v-if/v-show</div>
+                <div class="example-title">3. 条件渲染</div>
+                <div class="code-block">
+&lt;!-- Vue模板 --&gt;
+&lt;div <span class="highlight">v-if="isVisible"</span>&gt;
+  条件为真时显示
+&lt;/div&gt;
+&lt;div <span class="highlight">v-else-if="isOther"</span>&gt;
+  其他条件
+&lt;/div&gt;
+&lt;div <span class="highlight">v-else</span>&gt;
+  默认显示
+&lt;/div&gt;
+
+&lt;p <span class="highlight">v-show="isShown"</span>&gt;切换显示/隐藏&lt;/p&gt;
+
+&lt;!-- 数据 --&gt;
+data() {
+  return {
+    isVisible: true,
+    isOther: false,
+    isShown: true
+  }
+}
+                </div>
+            </div>
+            
+            <div class="js-section">
+                <div class="section-title">原生JavaScript</div>
+                <div class="example-title">DOM显示/隐藏操作</div>
+                <div class="code-block">
+const div1 = document.getElementById('conditional');
+const div2 = document.getElementById('other');
+const div3 = document.getElementById('default');
+const p = document.getElementById('toggle');
+
+// v-if 等价操作（添加/移除DOM）
+<span class="highlight">if (isVisible) {
+  document.body.appendChild(div1);
+} else {
+  div1.remove();
+}</span>
+
+// v-show 等价操作（显示/隐藏）
+<span class="highlight">if (isShown) {
+  p.style.display = 'block';
+} else {
+  p.style.display = 'none';
+}</span>
+
+// 或者使用类切换
+<span class="highlight">p.classList.toggle('hidden', !isShown);</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- v-for 对比 -->
+        <div class="comparison">
+            <div class="vue-section">
+                <div class="section-title">Vue.js - v-for</div>
+                <div class="example-title">4. 列表渲染</div>
+                <div class="code-block">
+&lt;!-- Vue模板 --&gt;
+&lt;ul&gt;
+  &lt;li <span class="highlight">v-for="item in items"</span> <span class="highlight">:key="item.id"</span>&gt;
+    {{ item.name }} - {{ item.price }}
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- 带索引 --&gt;
+&lt;div <span class="highlight">v-for="(item, index) in items"</span> <span class="highlight">:key="index"</span>&gt;
+  {{ index }}: {{ item.name }}
+&lt;/div&gt;
+
+&lt;!-- 数据 --&gt;
+data() {
+  return {
+    items: [
+      { id: 1, name: '苹果', price: 5 },
+      { id: 2, name: '香蕉', price: 3 },
+      { id: 3, name: '橙子', price: 4 }
+    ]
+  }
+}
+                </div>
+            </div>
+            
+            <div class="js-section">
+                <div class="section-title">原生JavaScript</div>
+                <div class="example-title">循环创建DOM元素</div>
+                <div class="code-block">
+const items = [
+  { id: 1, name: '苹果', price: 5 },
+  { id: 2, name: '香蕉', price: 3 },
+  { id: 3, name: '橙子', price: 4 }
+];
+
+const ul = document.createElement('ul');
+
+// 使用forEach循环
+<span class="highlight">items.forEach(item =&gt; {
+  const li = document.createElement('li');
+  li.textContent = `${item.name} - ${item.price}`;
+  li.setAttribute('data-id', item.id); // 相当于key
+  ul.appendChild(li);
+});</span>
+
+// 或使用for循环
+<span class="highlight">for (let i = 0; i &lt; items.length; i++) {
+  const div = document.createElement('div');
+  div.textContent = `${i}: ${items[i].name}`;
+  document.body.appendChild(div);
+}</span>
+
+document.body.appendChild(ul);
+                </div>
+            </div>
+        </div>
+
+        <!-- v-model 对比 -->
+        <div class="comparison">
+            <div class="vue-section">
+                <div class="section-title">Vue.js - v-model</div>
+                <div class="example-title">5. 双向数据绑定</div>
+                <div class="code-block">
+&lt;!-- Vue模板 --&gt;
+&lt;input <span class="highlight">v-model="message"</span> /&gt;
+&lt;textarea <span class="highlight">v-model="content"</span>&gt;&lt;/textarea&gt;
+&lt;select <span class="highlight">v-model="selected"</span>&gt;
+  &lt;option value="a"&gt;选项A&lt;/option&gt;
+  &lt;option value="b"&gt;选项B&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;p&gt;输入内容: {{ message }}&lt;/p&gt;
+
+&lt;!-- 数据 --&gt;
+data() {
+  return {
+    message: '初始值',
+    content: '',
+    selected: 'a'
+  }
+}
+                </div>
+            </div>
+            
+            <div class="js-section">
+                <div class="section-title">原生JavaScript</div>
+                <div class="example-title">事件监听 + 属性绑定</div>
+                <div class="code-block">
+let message = '初始值';
+let content = '';
+let selected = 'a';
+
+const input = document.querySelector('input');
+const textarea = document.querySelector('textarea');
+const select = document.querySelector('select');
+const p = document.querySelector('p');
+
+// 设置初始值
+<span class="highlight">input.value = message;
+textarea.value = content;
+select.value = selected;</span>
+
+// 监听输入事件，更新数据
+<span class="highlight">input.addEventListener('input', (e) =&gt; {
+  message = e.target.value;
+  p.textContent = `输入内容: ${message}`;
+});
+
+textarea.addEventListener('input', (e) =&gt; {
+  content = e.target.value;
+});
+
+select.addEventListener('change', (e) =&gt; {
+  selected = e.target.value;
+});</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实际演示 -->
+        <div class="demo-section">
+            <div class="demo-title">🎯 实际演示</div>
+            <div class="demo-buttons">
+                <button class="vue-btn" onclick="simulateVue()">模拟Vue效果</button>
+                <button class="js-btn" onclick="simulateJS()">原生JS效果</button>
+            </div>
+            <div id="demo-result">点击上方按钮查看效果...</div>
+        </div>
+    </div>
+
+    <script>
+        let counter = 0;
+        let todoList = ['学习Vue', '理解JavaScript', '实践项目'];
+        
+        function simulateVue() {
+            counter++;
+            const result = document.getElementById('demo-result');
+            
+            // 模拟Vue的响应式更新
+            result.innerHTML = `
+                <h3 style="color: #16a34a;">🚀 Vue风格效果 (第${counter}次点击)</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                    <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">
+                        <h4 style="margin: 0 0 10px 0; color: #065f46;">📝 Todo列表</h4>
+                        <ul style="margin: 0; padding-left: 20px;">
+                            ${todoList.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">
+                        <h4 style="margin: 0 0 10px 0; color: #065f46;">🎯 Vue特性</h4>
+                        <p style="margin: 5px 0; color: #047857;">✅ 数据驱动视图</p>
+                        <p style="margin: 5px 0; color: #047857;">✅ 组件化开发</p>
+                        <p style="margin: 5px 0; color: #047857;">✅ 声明式渲染</p>
+                    </div>
+                </div>
+                <div style="background: #f0fdfa; padding: 12px; border-radius: 5px; margin-top: 10px; border: 1px dashed #10b981;">
+                    <code style="color: #065f46; font-size: 12px;">
+                        &lt;li v-for="item in todoList" :key="item"&gt;{{ item }}&lt;/li&gt;<br>
+                        // Vue自动处理列表更新、事件绑定、响应式数据
+                    </code>
+                </div>
+            `;
+            
+            // 模拟Vue的响应式添加新任务
+            if (counter % 3 === 0) {
+                todoList.push(`新任务 ${Math.floor(counter/3)}`);
+            }
+        }
+        
+        function simulateJS() {
+            counter++;
+            const result = document.getElementById('demo-result');
+            
+            // 清空内容
+            result.innerHTML = '';
+            
+            // 手动创建所有DOM元素
+            const title = document.createElement('h3');
+            title.style.color = '#d97706';
+            title.textContent = `⚙️ 原生JS效果 (第${counter}次点击)`;
+            result.appendChild(title);
+            
+            // 创建网格容器
+            const grid = document.createElement('div');
+            grid.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;';
+            
+            // 左侧：Todo列表
+            const leftPanel = document.createElement('div');
+            leftPanel.style.cssText = 'background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;';
+            
+            const leftTitle = document.createElement('h4');
+            leftTitle.style.cssText = 'margin: 0 0 10px 0; color: #92400e;';
+            leftTitle.textContent = '📝 Todo列表';
+            leftPanel.appendChild(leftTitle);
+            
+            const ul = document.createElement('ul');
+            ul.style.cssText = 'margin: 0; padding-left: 20px;';
+            
+            // 手动循环创建每个li元素
+            todoList.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                ul.appendChild(li);
+            });
+            leftPanel.appendChild(ul);
+            
+            // 右侧：JS特点
+            const rightPanel = document.createElement('div');
+            rightPanel.style.cssText = 'background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;';
+            
+            const rightTitle = document.createElement('h4');
+            rightTitle.style.cssText = 'margin: 0 0 10px 0; color: #92400e;';
+            rightTitle.textContent = '🔧 JavaScript特点';
+            rightPanel.appendChild(rightTitle);
+            
+            const features = ['⚙️ 手动DOM操作', '⚙️ 事件处理逻辑', '⚙️ 状态管理复杂'];
+            features.forEach(feature => {
+                const p = document.createElement('p');
+                p.style.cssText = 'margin: 5px 0; color: #b45309;';
+                p.textContent = feature;
+                rightPanel.appendChild(p);
+            });
+            
+            grid.appendChild(leftPanel);
+            grid.appendChild(rightPanel);
+            result.appendChild(grid);
+            
+            // 代码示例
+            const codeDiv = document.createElement('div');
+            codeDiv.style.cssText = 'background: #fffbeb; padding: 12px; border-radius: 5px; margin-top: 10px; border: 1px dashed #f59e0b;';
+            
+            const code = document.createElement('code');
+            code.style.cssText = 'color: #92400e; font-size: 12px; line-height: 1.4;';
+            code.innerHTML = `
+todoList.forEach(item => {<br>
+&nbsp;&nbsp;const li = document.createElement('li');<br>
+&nbsp;&nbsp;li.textContent = item;<br>
+&nbsp;&nbsp;ul.appendChild(li);<br>
+});<br>
+// 需要手动管理DOM创建、事件绑定、状态更新
+            `;
+            
+            codeDiv.appendChild(code);
+            result.appendChild(codeDiv);
+            
+            // 模拟添加新任务
+            if (counter % 3 === 0) {
+                todoList.push(`新任务 ${Math.floor(counter/3)}`);
+            }
+        }
+        
+        function resetDemo() {
+            counter = 0;
+            todoList = ['学习Vue', '理解JavaScript', '实践项目'];
+            const result = document.getElementById('demo-result');
+            result.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">演示已重置，点击上方按钮开始体验...</p>';
+        }
+        
+        // 页面加载完成后的初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            resetDemo();
+        });
+    </script>
+</body>
+</html>
