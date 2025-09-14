@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue3里面的ref</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        :root {
+            --primary-color-start: #667eea;
+            --primary-color-end: #764ba2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color-start) 0%, var(--primary-color-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color-start) 0%, var(--primary-color-end) 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 8px 16px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 500;
+        }
+
+        .btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        .btn.toggle-btn { background: rgba(255, 255, 255, 0.3); border: 2px solid rgba(255, 255, 255, 0.5); }
+
+        .editor-container {
+            display: grid; grid-template-columns: 0fr 1fr; height: calc(100vh - 200px); min-height: 500px;
+            transition: grid-template-columns 0.3s ease;
+        }
+        .editor-container.expanded { grid-template-columns: 1fr 1fr; }
+
+        .editor-section, .preview-section {
+            padding: 20px; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        .editor-section {
+            border-right: 2px solid #e5e7eb; background: #fafafa; transition: all 0.3s ease; min-width: 0;
+        }
+
+        .editor-container:not(.expanded) .editor-section { padding: 0; border-right: none; }
+
+        .section-title {
+            font-size: 14px; font-weight: 600; color: #6b7280; margin-bottom: 15px; text-transform: uppercase;
+            letter-spacing: 1px; white-space: nowrap; overflow: hidden;
+        }
+
+        .editor-container:not(.expanded) .section-title { display: none; }
+
+        #editor {
+            width: 100%; height: 100%; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 15px; line-height: 1.6;
+            resize: none; outline: none; transition: all 0.3s ease; background: white; min-width: 0;
+        }
+
+        .editor-container:not(.expanded) #editor { width: 0; min-width: 0; border: none; padding: 0; opacity: 0; }
+        #editor:focus { border-color: var(--primary-color-start); box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+
+        .preview-section {
+            position: relative;
+        }
+
+        #toc-container {
+            position: absolute;
+            top: 60px;
+            right: 25px;
+            width: 240px;
+            max-height: calc(100% - 80px);
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #toc-container ul { list-style-type: none; padding-left: 0; }
+        #toc-container a {
+            display: block; padding: 4px 0; text-decoration: none; color: #4b5563;
+            transition: color 0.3s ease, transform 0.2s ease; font-weight: 500; font-size: 14px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        #toc-container a:hover { color: var(--primary-color-start); transform: translateX(5px); }
+
+        #toc-container .toc-level-1 { font-weight: bold; }
+        #toc-container .toc-level-2 { padding-left: 15px; }
+        #toc-container .toc-level-3 { padding-left: 30px; }
+        #toc-container .toc-level-4 { padding-left: 45px; }
+
+        #preview {
+            height: 100%; overflow-y: auto; padding: 20px; background: white;
+            border: 2px solid #e5e7eb; border-radius: 12px;
+        }
+
+        /* Add scroll margin to headings to avoid being covered by fixed headers */
+        #preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6 {
+             scroll-margin-top: 20px;
+        }
+
+        #preview h1 { color: #1f2937; border-bottom: 3px solid var(--primary-color-start); padding-bottom: 10px; margin: 20px 0; font-size: 2em; }
+        #preview h2 { color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin: 18px 0; font-size: 1.5em; }
+        #preview h3 { color: #4b5563; margin: 16px 0; font-size: 1.3em; }
+        #preview p { line-height: 1.8; margin: 12px 0; color: #374151; }
+        #preview pre { background: rgba(102,128,153,.05); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 16px 0; }
+        #preview code { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; }
+        #preview :not(pre) > code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; color: #e11d48; font-size: 0.9em; }
+        #preview blockquote { border-left: 4px solid var(--primary-color-start); padding: 16px 20px; margin: 16px 0; color: #6b7280; background: #f9fafb; border-radius: 0 8px 8px 0; }
+        #preview ul, #preview ol { padding-left: 30px; margin: 12px 0; }
+        #preview li { margin: 8px 0; line-height: 1.6; }
+        #preview table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+        #preview th, #preview td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; }
+        #preview th { background: #f9fafb; font-weight: 600; color: #374151; }
+        #preview img { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+        #preview a { color: var(--primary-color-start); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.3s ease; }
+        #preview a:hover { border-bottom-color: var(--primary-color-start); }
+
+        .stats {
+            display: flex; gap: 20px; padding: 15px 30px; background: #f9fafb;
+            border-top: 1px solid #e5e7eb; font-size: 13px; color: #6b7280;
+        }
+        .stat { display: flex; align-items: center; gap: 5px; }
+        .stat strong { color: #374151; }
+
+        .toggle-editor-btn {
+            position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
+            background: rgba(102, 126, 234, 0.9); color: white; border: none; border-radius: 50%; width: 50px; height: 50px;
+            cursor: pointer; transition: all 0.3s ease; font-size: 18px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); z-index: 1000;
+        }
+        .toggle-editor-btn:hover { background: rgba(102, 126, 234, 1); transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .editor-container.expanded + .toggle-editor-btn { left: 50%; transform: translateX(-50%) translateY(-50%); }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            #toc-container {
+                position: static;
+                width: auto;
+                max-height: 200px;
+                margin-bottom: 20px;
+                box-shadow: none;
+                backdrop-filter: none;
+                background: white;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .editor-container, .editor-container.expanded { grid-template-columns: 1fr; height: auto; }
+            .editor-section { border-right: none; border-bottom: 2px solid #e5e7eb; min-height: 300px; }
+            .editor-container:not(.expanded) .editor-section { display: none; }
+            .preview-section { min-height: 300px; }
+            .toggle-editor-btn { position: static; transform: none; margin: 10px auto; display: block; width: auto; padding: 10px 20px; border-radius: 8px; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>📝</span>
+                Vue3里面的ref
+            </h1>
+            <div class="toolbar">
+                <button class="btn toggle-btn" onclick="toggleEditor()">
+                    <span id="toggleText">展开编辑器</span>
+                </button>
+                <button class="btn" onclick="insertText('**', '**')">粗体</button>
+                <button class="btn" onclick="insertText('*', '*')">斜体</button>
+                <button class="btn" onclick="insertText('# ', '')">标题</button>
+                <button class="btn" onclick="insertText('[', '](url)')">链接</button>
+                <button class="btn" onclick="insertText('```\n', '\n```')">代码块</button>
+                <button class="btn" onclick="insertText('> ', '')">引用</button>
+                <button class="btn" onclick="clearEditor()">清空</button>
+                <button class="btn" onclick="loadExample()">示例</button>
+            </div>
+        </div>
+        
+        <div class="editor-container" id="editorContainer">
+            <div class="editor-section">
+                <div class="section-title">Markdown 输入</div>
+                <textarea id="editor" placeholder="在这里输入 Markdown 内容...">在 Vue.js 中，`ref` 是一个非常重要的概念，用于创建响应式数据引用。我来详细解释一下：
+
+## 什么是 ref
+
+`ref` 是 Vue 3 Composition API 中用来创建响应式数据的函数。它可以让一个普通的值变成响应式的，当这个值发生变化时，使用它的组件会自动重新渲染。
+
+## 基本使用方法
+
+```javascript
+import { ref } from 'vue'
+
+// 创建一个响应式的引用
+const count = ref(0)
+
+// 在 JavaScript 中访问/修改值需要使用 .value
+console.log(count.value) // 0
+count.value = 1
+console.log(count.value) // 1
+```
+
+## 在组件中的完整示例
+
+```javascript
+<template>
+  <div>
+    <p>计数: {{ count }}</p>
+    <button @click="increment">增加</button>
+    <button @click="decrement">减少</button>
+
+    <p>用户名: {{ username }}</p>
+    <input v-model="username" placeholder="输入用户名">
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+// 数字类型的 ref
+const count = ref(0)
+
+// 字符串类型的 ref
+const username = ref('')
+
+// 修改 ref 的值
+function increment() {
+  count.value++
+}
+
+function decrement() {
+  count.value--
+}
+</script>
+```
+
+## 重要特点
+
+1. **在 JavaScript 中访问需要 `.value`**：
+   ```javascript
+   const num = ref(10)
+   console.log(num.value) // 需要 .value
+   num.value = 20 // 修改也需要 .value
+   ```
+
+2. **在模板中自动解包**：
+   ```html
+   <!-- 模板中不需要 .value -->
+   <p>{{ num }}</p>
+   ```
+
+3. **支持各种数据类型**：
+   ```javascript
+   const message = ref('Hello')
+   const isVisible = ref(true)
+   const user = ref({ name: 'John', age: 25 })
+   const items = ref(['apple', 'banana'])
+   ```
+
+## 与对象/数组的使用
+
+```javascript
+<template>
+  <div>
+    <p>{{ user.name }} - {{ user.age }}岁</p>
+    <button @click="updateUser">更新用户</button>
+
+    <ul>
+      <li v-for="item in items" :key="item">{{ item }}</li>
+    </ul>
+    <button @click="addItem">添加项目</button>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const user = ref({
+  name: 'Alice',
+  age: 30
+})
+
+const items = ref(['苹果', '香蕉'])
+
+function updateUser() {
+  // 修改对象属性
+  user.value.name = 'Bob'
+  user.value.age = 25
+}
+
+function addItem() {
+  // 修改数组
+  items.value.push('橙子')
+}
+</script>
+```
+
+## ref vs reactive
+
+Vue 还提供了 `reactive` 函数，两者的区别：
+
+- `ref`：适用于基本数据类型，访问时需要 `.value`
+- `reactive`：适用于对象和数组，访问时不需要 `.value`
+
+```javascript
+import { ref, reactive } from 'vue'
+
+// 使用 ref
+const count = ref(0)
+const user = ref({ name: 'John' })
+
+// 使用 reactive
+const state = reactive({
+  count: 0,
+  user: { name: 'John' }
+})
+
+// 访问方式不同
+console.log(count.value) // ref 需要 .value
+console.log(user.value.name) // ref 对象也需要 .value
+console.log(state.count) // reactive 不需要 .value
+console.log(state.user.name) // reactive 不需要 .value
+```
+
+`ref` 是 Vue 3 响应式系统的核心，掌握它的使用对于编写现代 Vue 应用非常重要。
+
+                </textarea>
+            </div>
+            
+            <div class="preview-section">
+                <div class="section-title">预览</div>
+                <div id="toc-container"></div>
+                <div id="preview"></div>
+            </div>
+        </div>
+        
+        <button class="toggle-editor-btn" onclick="toggleEditor()" id="floatingToggle">
+            <span id="floatingIcon">✏️</span>
+        </button>
+        
+        <div class="stats">
+            <div class="stat">
+                <span>字符数：</span>
+                <strong id="charCount">0</strong>
+            </div>
+            <div class="stat">
+                <span>字数：</span>
+                <strong id="wordCount">0</strong>
+            </div>
+            <div class="stat">
+                <span>行数：</span>
+                <strong id="lineCount">0</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 配置marked选项
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        const editorContainer = document.getElementById('editorContainer');
+        const tocContainer = document.getElementById('toc-container');
+        let isEditorExpanded = false;
+
+        // 切换编辑器显示/隐藏
+        function toggleEditor() {
+            isEditorExpanded = !isEditorExpanded;
+            const toggleText = document.getElementById('toggleText');
+            const floatingIcon = document.getElementById('floatingIcon');
+            
+            if (isEditorExpanded) {
+                editorContainer.classList.add('expanded');
+                toggleText.textContent = '隐藏编辑器';
+                floatingIcon.textContent = '👁️';
+                setTimeout(() => editor.focus(), 300);
+            } else {
+                editorContainer.classList.remove('expanded');
+                toggleText.textContent = '展开编辑器';
+                floatingIcon.textContent = '✏️';
+            }
+        }
+
+        // 实时更新预览
+        function updatePreview() {
+            const markdown = editor.value;
+            preview.innerHTML = marked.parse(markdown);
+            updateStats();
+            generateToc();
+        }
+
+        // 生成目录
+        function generateToc() {
+            const headings = preview.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            tocContainer.innerHTML = '';
+
+            if (headings.length === 0) return;
+
+            const tocList = document.createElement('ul');
+
+            headings.forEach((heading, index) => {
+                const level = parseInt(heading.tagName.substring(1));
+                const text = heading.textContent;
+
+                // 为标题创建ID以便跳转
+                const id = 'toc-heading-' + index;
+                heading.id = id;
+
+                const listItem = document.createElement('li');
+                listItem.className = 'toc-level-' + level;
+
+                const link = document.createElement('a');
+                link.textContent = text;
+                link.href = '#' + id;
+
+                listItem.appendChild(link);
+                tocList.appendChild(listItem);
+            });
+
+            tocContainer.appendChild(tocList);
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            const text = editor.value;
+            document.getElementById('charCount').textContent = text.length;
+            document.getElementById('wordCount').textContent = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            document.getElementById('lineCount').textContent = text.split('\n').length;
+        }
+
+        // 插入文本
+        function insertText(before, after) {
+            // 如果编辑器未展开，先展开它
+            if (!isEditorExpanded) {
+                toggleEditor();
+                setTimeout(() => {
+                    performInsert(before, after);
+                }, 300);
+            } else {
+                performInsert(before, after);
+            }
+        }
+
+        function performInsert(before, after) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const text = editor.value;
+            const selectedText = text.substring(start, end);
+            
+            editor.value = text.substring(0, start) + before + selectedText + after + text.substring(end);
+            editor.focus();
+            
+            const newPosition = start + before.length + selectedText.length;
+            editor.setSelectionRange(newPosition, newPosition);
+            
+            updatePreview();
+        }
+
+        // 清空编辑器
+        function clearEditor() {
+            if (confirm('确定要清空所有内容吗？')) {
+                editor.value = '';
+                updatePreview();
+                if (!isEditorExpanded) {
+                    toggleEditor();
+                }
+            }
+        }
+
+        // 加载示例
+        function loadExample() {
+            editor.value = `# Markdown 完整示例
+
+## 文本格式
+
+这是**粗体文本**，这是*斜体文本*，这是***粗斜体文本***。
+
+这是\`行内代码\`，这是~~删除线~~。
+
+## 列表
+
+### 无序列表
+- 项目 1
+- 项目 2
+  - 子项目 2.1
+  - 子项目 2.2
+- 项目 3
+
+### 有序列表
+1. 第一步
+2. 第二步
+3. 第三步
+
+## 链接和图片
+
+[访问 GitHub](https://github.com)
+
+![示例图片](https://via.placeholder.com/300x200)
+
+## 引用
+
+> 这是一段引用文本。
+> 可以有多行。
+
+## 代码块
+
+\`\`\`python
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+print(fibonacci(10))
+\`\`\`
+
+## 表格
+
+| 姓名 | 年龄 | 职业 |
+|------|------|------|
+| 张三 | 25   | 工程师 |
+| 李四 | 30   | 设计师 |
+| 王五 | 28   | 产品经理 |
+
+## 分割线
+
+---
+
+## 任务列表
+
+- [x] 完成的任务
+- [ ] 未完成的任务
+- [ ] 待办事项
+
+## 数学公式（需要额外支持）
+
+当 $a \\ne 0$ 时，二次方程 $ax^2 + bx + c = 0$ 的解为：
+
+$$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$
+
+## 预览优先设计
+
+这个编辑器现在默认以**预览模式**为主，编辑器可以按需展开。这种设计更适合：
+
+- 📖 阅读和查看Markdown内容
+- 🎯 专注于内容展示
+- 💡 需要时才进行编辑
+- 🖥️ 节省屏幕空间
+
+点击"展开编辑器"按钮或使用浮动按钮来切换编辑模式！`;
+            updatePreview();
+            if (!isEditorExpanded) {
+                toggleEditor();
+            }
+        }
+
+        // 监听输入事件
+        editor.addEventListener('input', updatePreview);
+
+        // 支持Tab键
+        editor.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                const text = editor.value;
+                
+                editor.value = text.substring(0, start) + '    ' + text.substring(end);
+                editor.setSelectionRange(start + 4, start + 4);
+                updatePreview();
+            }
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + E 切换编辑器
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                toggleEditor();
+            }
+        });
+
+        // 初始化预览
+        updatePreview();
+    </script>
+</body>
+</html>
