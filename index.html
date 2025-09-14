@@ -71,13 +71,60 @@
             <a href="1.vue/Vue3里面的ref.html">Vue3里面的ref</a>
         </li>
         <li>
-            <a href="1.vue/Vue计算属性.html">Vue计算属性</a>
+            <a href="1.vue/Vue3里面的script%20setup.html">Vue3里面的script setup</a>
         </li>
         <li>
-            <a href="1.vue/Vue计算属性.html">Vue计算属性</a>
+            <a href="1.vue/Vue@事件监听语法详解.html">Vue@事件监听语法详解</a>
+        </li>
+        <li>
+            <a href="1.vue/Vue三大核心语法完整对比.svg">Vue三大核心语法完整对比</a>
+        </li>
+        <li>
+            <a href="1.vue/Vue指令与JavaScript完整映射表.html">Vue指令与JavaScript完整映射表</a>
+        </li>
+        <li>
+            <a href="1.vue/Vue模板语法详解.html">Vue模板语法详解</a>
+        </li>
+        <li>
+            <a href="1.vue/实际开发场景对比.html">实际开发场景对比</a>
         </li>
         <!-- 如果有更多文件，可以在这里继续添加 -->
     </ul>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置所有链接在新标签页打开
+        const links = document.getElementsByTagName('a');
+        for(let link of links) {
+            link.target = '_blank';
+        }
+
+        // 添加交互效果
+        const fileItems = document.querySelectorAll('.file-item');
+        fileItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // 添加滚动时的渐入动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = '0s';
+                    entry.target.style.animationName = 'fadeInUp';
+                }
+            });
+        });
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+    });
+</script>
 </body>
 </html>
